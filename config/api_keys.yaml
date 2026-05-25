@@ -1,0 +1,8 @@
+# Provider -> .env variable name mapping (Phase A.3.1).
+# When a provider's env var is missing, that provider's adapter degrades
+# silently. Other priority-ranked sources still cover the canonical field.
+
+fmp:      FMP_API_KEY
+polygon:  POLYGON_API_KEY
+tiingo:   TIINGO_API_KEY
+intrinio: INTRINIO_API_KEY

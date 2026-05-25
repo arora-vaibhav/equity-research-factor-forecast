@@ -1,0 +1,144 @@
+# Static alias table: ticker → list of company-name substrings to match
+# against the GDELT GKG V1ORGANIZATIONS column.
+#
+# v1 covers the top-50 US stocks by market cap. The long tail relies on
+# cashtag matches.  Add aliases here when news_volume_anomaly signal
+# proves itself in A.3.10 backtesting.
+#
+# Matching is case-insensitive substring: if ANY alias appears in the
+# semicolon-separated V1ORGANIZATIONS string, the row is attributed
+# to that ticker with match_method='alias'.
+#
+# WARNING: do not use short / ambiguous aliases (e.g. "Apple" for AAPL
+# would also match "Pineapple Corp").  Use full legal names.
+
+aliases:
+  AAPL:
+    - "Apple Inc"
+    - "Apple Computer"
+  MSFT:
+    - "Microsoft Corp"
+    - "Microsoft Corporation"
+  GOOGL:
+    - "Alphabet Inc"
+    - "Google LLC"
+    - "Google Inc"
+  AMZN:
+    - "Amazon.com Inc"
+    - "Amazon Web Services"
+  NVDA:
+    - "NVIDIA Corp"
+    - "Nvidia Corporation"
+  META:
+    - "Meta Platforms"
+    - "Facebook Inc"
+  TSLA:
+    - "Tesla Inc"
+    - "Tesla Motors"
+  LLY:
+    - "Eli Lilly"
+    - "Eli Lilly and Company"
+  V:
+    - "Visa Inc"
+  JPM:
+    - "JPMorgan Chase"
+    - "J.P. Morgan"
+  UNH:
+    - "UnitedHealth Group"
+    - "United Health Group"
+  WMT:
+    - "Walmart Inc"
+    - "Wal-Mart Stores"
+  MA:
+    - "Mastercard Inc"
+    - "Mastercard Incorporated"
+  XOM:
+    - "Exxon Mobil"
+    - "ExxonMobil Corp"
+  JNJ:
+    - "Johnson & Johnson"
+    - "Johnson and Johnson"
+  PG:
+    - "Procter & Gamble"
+    - "Procter and Gamble"
+  HD:
+    - "Home Depot"
+    - "The Home Depot"
+  CVX:
+    - "Chevron Corp"
+    - "Chevron Corporation"
+  ABBV:
+    - "AbbVie Inc"
+  COST:
+    - "Costco Wholesale"
+  BAC:
+    - "Bank of America"
+  MRK:
+    - "Merck & Co"
+    - "Merck and Co"
+  KO:
+    - "Coca-Cola Co"
+    - "The Coca-Cola Company"
+  PEP:
+    - "PepsiCo Inc"
+  AVGO:
+    - "Broadcom Inc"
+  TMO:
+    - "Thermo Fisher Scientific"
+  CSCO:
+    - "Cisco Systems"
+  ACN:
+    - "Accenture PLC"
+    - "Accenture plc"
+  MCD:
+    - "McDonald's Corp"
+    - "McDonalds Corporation"
+  ADBE:
+    - "Adobe Inc"
+  ABT:
+    - "Abbott Laboratories"
+  NFLX:
+    - "Netflix Inc"
+  CRM:
+    - "Salesforce Inc"
+    - "Salesforce.com"
+  DHR:
+    - "Danaher Corp"
+  DIS:
+    - "Walt Disney"
+    - "The Walt Disney Company"
+  AMD:
+    - "Advanced Micro Devices"
+  TXN:
+    - "Texas Instruments"
+  AMGN:
+    - "Amgen Inc"
+  VZ:
+    - "Verizon Communications"
+  INTU:
+    - "Intuit Inc"
+  NEE:
+    - "NextEra Energy"
+  IBM:
+    - "International Business Machines"
+    - "IBM Corp"
+  QCOM:
+    - "Qualcomm Inc"
+  GS:
+    - "Goldman Sachs"
+    - "The Goldman Sachs Group"
+  AMAT:
+    - "Applied Materials"
+  RTX:
+    - "RTX Corp"
+    - "Raytheon Technologies"
+  SPGI:
+    - "S&P Global"
+    - "S P Global"
+  ISRG:
+    - "Intuitive Surgical"
+  LOW:
+    - "Lowe's Companies"
+    - "Lowes Companies"
+  BX:
+    - "Blackstone Inc"

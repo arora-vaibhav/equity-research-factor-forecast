@@ -1,0 +1,84 @@
+# Phase A.3.7.5 - Rate-Limited Fetch Orchestrator configuration.
+#
+# Edit this file (no code change required) to adjust per-provider quotas,
+# re-weight priorities, or remap which providers a source consumes.
+#
+# Quotas are SLIDING windows: "quota_calls in any quota_window_seconds"
+# means at any wall-clock instant the orchestrator may have made at most
+# quota_calls calls in the preceding quota_window_seconds.
+
+providers:
+  fmp_stable:
+    quota_calls: 250
+    quota_window_seconds: 86400
+  polygon:
+    quota_calls: 5
+    quota_window_seconds: 60
+  tiingo:
+    quota_calls: 1000
+    quota_window_seconds: 86400
+  sec_edgar:
+    quota_calls: 10
+    quota_window_seconds: 1
+  fred:
+    quota_calls: 120
+    quota_window_seconds: 60
+  finra:
+    quota_calls: 60
+    quota_window_seconds: 60
+  yahoo:
+    quota_calls: 2000
+    quota_window_seconds: 3600
+  finviz:
+    quota_calls: 60
+    quota_window_seconds: 60
+  stockanalysis:
+    quota_calls: 30
+    quota_window_seconds: 60
+  # A.3.8: GDELT global news database (public, no API key).
+  # Plan §942: polite 60 calls / 60s ceiling (GDELT is unmetered but heavy).
+  gdelt:
+    quota_calls: 60
+    quota_window_seconds: 60
+  # A.3.8: Google Trends via pytrends (very aggressive rate limiting).
+  # Plan §942: 5 calls / 60s sliding window matches PytrendsSource's 12s
+  # inter-term throttle (60s / 12s/term = 5/min ceiling).
+  pytrends:
+    quota_calls: 5
+    quota_window_seconds: 60
+
+source_providers:
+  openbb: [fmp_stable, polygon, tiingo]
+  edgar: [sec_edgar]
+  fred: [fred]
+  finra: [finra]
+  yahoo: [yahoo]
+  finviz: [finviz]
+  stockanalysis: [stockanalysis]
+  # A.3.8 new sources
+  gdelt: [gdelt]
+  pytrends: [pytrends]
+
+weights:
+  edgar:
+    form4: 100
+    form_8k: 80
+    fundamentals: 40
+  openbb:
+    fundamentals: 30
+  yahoo:
+    prices_daily: 25
+  finviz:
+    snapshot: 20
+  stockanalysis:
+    ratios_10y: 15
+  finra:
+    short_volume: 10
+    margin_debt: 10
+  fred:
+    macro_series: 5
+  # A.3.8 news-activity signal weights (per plan §966-974)
+  gdelt:
+    news_volume: 12        # Tetlock medium-confidence per spec §7.1
+  pytrends:
+    fears: 5               # FEARS lowest composite weight (0.05) per spec §7.3

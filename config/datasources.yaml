@@ -1,0 +1,82 @@
+# Multi-source data adapter configuration.
+# Spec: docs/claude-code/specs/2026-05-21-multi-source-data-adapter-design.md §9.
+# 2026-05-21: broadened Finviz universe to a $1B+ intent.
+
+# --- Finviz universe filter --------------------------------------------
+# Read by src/common/datasources/finviz_source.py at every fetch_universe call.
+# Intent: everything above $1B market cap.
+# Finviz has no exact $1B preset; available bands:
+#   "Any"                     - every stock (~10,000+; too noisy)
+#   "+Small (over $300mln)"   - small-cap and above (~5,000 rows)
+#   "+Mid (over $2bln)"       - CURRENT DEFAULT, closest to $1B+ intent
+#   "+Large (over $10bln)"    - large-cap only (~700 rows)
+#   "Mega ($200bln and more)" - original A.1 default (~70 rows)
+# To get strict $1B+ later: switch to "+Small (over $300mln)" and apply
+# market_cap_min_usd: 1_000_000_000 in config/filters.yaml downstream.
+finviz_universe_filter: "+Mid (over $2bln)"
+
+enabled_sources:
+  - finviz
+  - yahoo
+  - edgar
+  - fred
+  - stockanalysis
+  - finra
+  # A.3.8 news-activity substrate sources
+  - gdelt
+  - pytrends
+
+source_priority:
+  fundamentals:   [edgar, stockanalysis, yahoo, finviz]
+  prices:         [yahoo, finviz]
+  identifiers:    [edgar, yahoo, finviz]
+  short_interest: [finra, finviz]
+  macro:          [fred]
+
+priority_weights:
+  decay: 0.5
+
+field_resolution:
+  weighted_average:
+    - pe_ttm
+    - pe_forward
+    - ebit_ttm
+    - fcf_ttm
+    - operating_margin
+    - net_profit_margin
+    - roe
+    - roic
+    - total_debt_to_equity
+    - interest_coverage
+    - revenue_growth_yoy
+    - eps_growth_yoy
+  highest_priority:
+    - sector
+    - industry
+    - company_name
+    - cik
+    - exchange
+    - short_interest_pct_float
+  freshest:
+    - price
+    - market_cap_usd
+    - avg_daily_volume
+    - rsi_14
+    - dist_52w_high
+    - dist_52w_low
+    - dist_200dma
+    - perf_1m
+    - perf_3m
+    - perf_6m
+    - perf_12m
+  derived:
+    - pe_5y_percentile
+    - ev_ebitda_5y_percentile
+    - data_quality_score
+
+disagreement_threshold_log_only: 0.10
+
+cadence_window_hours:
+  weekly:    168
+  biweekly:  336
+  monthly:   720
