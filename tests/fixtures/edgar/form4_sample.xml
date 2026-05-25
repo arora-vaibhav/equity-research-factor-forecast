@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ownershipDocument>
+  <schemaVersion>X0306</schemaVersion>
+  <documentType>4</documentType>
+  <periodOfReport>2026-03-15</periodOfReport>
+  <issuer>
+    <issuerCik>0000320193</issuerCik>
+    <issuerName>Apple Inc.</issuerName>
+    <issuerTradingSymbol>AAPL</issuerTradingSymbol>
+  </issuer>
+  <reportingOwner>
+    <reportingOwnerId>
+      <rptOwnerCik>0001214156</rptOwnerCik>
+      <rptOwnerName>COOK TIMOTHY D</rptOwnerName>
+    </reportingOwnerId>
+    <reportingOwnerAddress>
+      <rptOwnerStreet1>ONE APPLE PARK WAY</rptOwnerStreet1>
+      <rptOwnerCity>CUPERTINO</rptOwnerCity>
+      <rptOwnerState>CA</rptOwnerState>
+      <rptOwnerZipCode>95014</rptOwnerZipCode>
+    </reportingOwnerAddress>
+    <reportingOwnerRelationship>
+      <isDirector>1</isDirector>
+      <isOfficer>1</isOfficer>
+      <isTenPercentOwner>0</isTenPercentOwner>
+      <isOther>0</isOther>
+      <officerTitle>Chief Executive Officer</officerTitle>
+    </reportingOwnerRelationship>
+  </reportingOwner>
+  <nonDerivativeTable>
+    <nonDerivativeTransaction>
+      <securityTitle>
+        <value>Common Stock</value>
+      </securityTitle>
+      <transactionDate>
+        <value>2026-03-15</value>
+      </transactionDate>
+      <transactionCoding>
+        <transactionFormType>4</transactionFormType>
+        <transactionCode>P</transactionCode>
+        <equitySwapInvolved>0</equitySwapInvolved>
+      </transactionCoding>
+      <transactionAmounts>
+        <transactionShares>
+          <value>1000</value>
+        </transactionShares>
+        <transactionPricePerShare>
+          <value>175.25</value>
+        </transactionPricePerShare>
+        <transactionAcquiredDisposedCode>
+          <value>A</value>
+        </transactionAcquiredDisposedCode>
+      </transactionAmounts>
+      <postTransactionAmounts>
+        <sharesOwnedFollowingTransaction>
+          <value>3279000</value>
+        </sharesOwnedFollowingTransaction>
+      </postTransactionAmounts>
+      <ownershipNature>
+        <directOrIndirectOwnership>
+          <value>D</value>
+        </directOrIndirectOwnership>
+      </ownershipNature>
+    </nonDerivativeTransaction>
+    <nonDerivativeTransaction>
+      <securityTitle>
+        <value>Common Stock</value>
+      </securityTitle>
+      <transactionDate>
+        <value>2026-03-15</value>
+      </transactionDate>
+      <transactionCoding>
+        <transactionFormType>4</transactionFormType>
+        <transactionCode>S</transactionCode>
+        <equitySwapInvolved>0</equitySwapInvolved>
+      </transactionCoding>
+      <transactionAmounts>
+        <transactionShares>
+          <value>500</value>
+        </transactionShares>
+        <transactionPricePerShare>
+          <value>176.00</value>
+        </transactionPricePerShare>
+        <transactionAcquiredDisposedCode>
+          <value>D</value>
+        </transactionAcquiredDisposedCode>
+      </transactionAmounts>
+      <postTransactionAmounts>
+        <sharesOwnedFollowingTransaction>
+          <value>3278500</value>
+        </sharesOwnedFollowingTransaction>
+      </postTransactionAmounts>
+      <ownershipNature>
+        <directOrIndirectOwnership>
+          <value>D</value>
+        </directOrIndirectOwnership>
+      </ownershipNature>
+    </nonDerivativeTransaction>
+  </nonDerivativeTable>
+  <derivativeTable>
+    <derivativeTransaction>
+      <securityTitle>
+        <value>Restricted Stock Unit</value>
+      </securityTitle>
+      <conversionOrExercisePrice>
+        <footnoteId id="F1"/>
+      </conversionOrExercisePrice>
+      <transactionDate>
+        <value>2026-03-15</value>
+      </transactionDate>
+      <transactionCoding>
+        <transactionFormType>4</transactionFormType>
+        <transactionCode>M</transactionCode>
+        <equitySwapInvolved>0</equitySwapInvolved>
+      </transactionCoding>
+      <transactionAmounts>
+        <transactionShares>
+          <value>2500</value>
+        </transactionShares>
+        <transactionPricePerShare>
+          <value>0</value>
+        </transactionPricePerShare>
+        <transactionAcquiredDisposedCode>
+          <value>D</value>
+        </transactionAcquiredDisposedCode>
+      </transactionAmounts>
+    </derivativeTransaction>
+  </derivativeTable>
+  <footnotes>
+    <footnote id="F1">Each restricted stock unit represents a contingent right to receive one share of Apple common stock.</footnote>
+  </footnotes>
+  <ownerSignature>
+    <signatureName>/s/ Sam Whittington, Attorney-in-Fact</signatureName>
+    <signatureDate>2026-03-17</signatureDate>
+  </ownerSignature>
+</ownershipDocument>

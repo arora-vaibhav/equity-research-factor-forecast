@@ -1,0 +1,30 @@
+[
+  {
+    "symbol": "AAPL",
+    "price": 180.50,
+    "beta": 1.275,
+    "volAvg": 60000000,
+    "mktCap": 2810000000000,
+    "lastDiv": 0.96,
+    "range": "164.08-199.62",
+    "changes": 2.19,
+    "companyName": "Apple Inc.",
+    "currency": "USD",
+    "cik": "0000320193",
+    "isin": "US0378331005",
+    "cusip": "037833100",
+    "exchange": "NASDAQ Global Select",
+    "exchangeShortName": "NASDAQ",
+    "industry": "Consumer Electronics",
+    "website": "https://www.apple.com",
+    "description": "Apple Inc. designs, manufactures, and markets...",
+    "ceo": "Mr. Timothy D. Cook",
+    "sector": "Technology",
+    "country": "US",
+    "fullTimeEmployees": "164000",
+    "phone": "408-996-1010",
+    "ipoDate": "1980-12-12",
+    "dividendYield": 0.0053,
+    "isEtf": false
+  }
+]

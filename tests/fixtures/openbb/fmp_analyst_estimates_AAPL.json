@@ -1,0 +1,28 @@
+[
+  {
+    "symbol": "AAPL",
+    "date": "2026-09-30",
+    "estimatedRevenueLow": 85000000000.0,
+    "estimatedRevenueHigh": 95000000000.0,
+    "estimatedRevenueAvg": 90000000000.0,
+    "estimatedEpsAvg": 1.55,
+    "estimatedEpsHigh": 1.65,
+    "estimatedEpsLow": 1.45,
+    "numAnalystsRevisionUp": 8,
+    "numAnalystsRevisionDown": 2,
+    "numAnalystsEstimates": 32
+  },
+  {
+    "symbol": "AAPL",
+    "date": "2026-06-30",
+    "estimatedRevenueLow": 81000000000.0,
+    "estimatedRevenueHigh": 89000000000.0,
+    "estimatedRevenueAvg": 85000000000.0,
+    "estimatedEpsAvg": 1.42,
+    "estimatedEpsHigh": 1.50,
+    "estimatedEpsLow": 1.35,
+    "numAnalystsRevisionUp": 5,
+    "numAnalystsRevisionDown": 3,
+    "numAnalystsEstimates": 28
+  }
+]

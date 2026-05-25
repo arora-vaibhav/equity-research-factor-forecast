@@ -1,0 +1,19 @@
+[
+  {
+    "symbol": "AAPL",
+    "peRatioTTM": 28.45,
+    "priceToSalesRatioTTM": 7.55,
+    "priceToBookRatioTTM": 52.10,
+    "dividendYieldTTM": 0.0044,
+    "payoutRatioTTM": 0.16,
+    "currentRatioTTM": 1.04,
+    "quickRatioTTM": 0.92,
+    "debtToEquityTTM": 3.30,
+    "returnOnEquityTTM": 1.6532,
+    "returnOnAssetsTTM": 0.2810,
+    "grossProfitMarginTTM": 0.4612,
+    "operatingProfitMarginTTM": 0.3151,
+    "netProfitMarginTTM": 0.2640,
+    "freeCashFlowYieldTTM": 0.038
+  }
+]

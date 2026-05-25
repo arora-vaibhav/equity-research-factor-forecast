@@ -1,0 +1,1 @@
+﻿9999999999000	GDELT	http://data.gdeltproject.org/gdeltv2/20260520201500.gkg.csv.gz

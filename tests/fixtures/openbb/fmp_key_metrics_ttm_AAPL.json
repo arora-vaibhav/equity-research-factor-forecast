@@ -1,0 +1,20 @@
+[
+  {
+    "symbol": "AAPL",
+    "revenuePerShareTTM": 24.65,
+    "netIncomePerShareTTM": 6.42,
+    "operatingCashFlowPerShareTTM": 7.55,
+    "freeCashFlowPerShareTTM": 6.88,
+    "cashPerShareTTM": 4.20,
+    "bookValuePerShareTTM": 3.46,
+    "tangibleBookValuePerShareTTM": 3.40,
+    "marketCapTTM": 2810000000000,
+    "enterpriseValueTTM": 2870000000000,
+    "peRatioTTM": 28.45,
+    "priceToSalesRatioTTM": 7.55,
+    "evToSalesTTM": 7.71,
+    "enterpriseValueOverEBITDATTM": 21.30,
+    "evToOperatingCashFlowTTM": 24.10,
+    "evToFreeCashFlowTTM": 26.42
+  }
+]
