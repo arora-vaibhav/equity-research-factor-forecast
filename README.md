@@ -1,6 +1,6 @@
 # Equity Research Reporting — Factor Forecast Model (Claude Integrated)
 
-A research-grade equity factor forecast and reporting pipeline. Multi-source data fabric, a methodology library that traces back to the papers, and a three-layer pipeline that ends in a per-ticker HTML report. Built end-to-end with Claude Code under a spec-then-plan-then-implement discipline.
+A research-grade equity factor forecast and reporting pipeline. Multi-source data fabric, a methodology library that traces every signal back to the papers, and a three-layer pipeline that ends in a per-ticker HTML report.
 
 ![CI](https://github.com/arora-vaibhav/equity-research-factor-forecast-claude/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
@@ -23,7 +23,7 @@ The whole pipeline runs on free data sources. Everything that comes out the othe
 - **Status:** research prototype, not a trading system
 - **Does not** place orders, size positions, manage risk, or recommend buys/sells
 - **Audience:** quantitative researchers, fundamental analysts using factor screens as inputs, and engineering reviewers evaluating the build process
-- **Purpose:** published as a learning artifact and a demonstration of a spec-driven, sub-agent-parallel build process with Claude Code
+- **Purpose:** published as a learning artifact that documents the methodology, data engineering, and design discipline behind a multi-source equity research pipeline
 - **Calibration:** numbers reported here are point estimates with cross-validation standard deviations on three tickers (AAPL, MSFT, BAC) over five-year daily data; treat as illustrative, not as a portfolio backtest
 
 ---
@@ -169,15 +169,13 @@ The full audit lives at `docs/benchmarks/directional_accuracy.md`, with the repr
 
 ---
 
-## How I built this with Claude Code
+## Design discipline
 
-I built this with Claude Code and the `superpowers` plugin under a strict spec-then-plan-then-implement loop. The workflow was: brainstorm the problem in plain English, write a spec covering what the component is and what acceptance criteria it has to clear, write a plan that decomposes the spec into independently-shippable sub-tasks, dispatch sub-tasks to parallel sub-agents under test-first discipline, then review every diff before merge. The receipts for all of it are preserved under `docs/claude-code/specs/` and `docs/claude-code/plans/`.
+Every non-trivial component in this project was specified before it was implemented. The design specs and implementation plans I wrote during the build are preserved under [`docs/claude-code/specs/`](docs/claude-code/specs) and [`docs/claude-code/plans/`](docs/claude-code/plans). Each spec names the design alternatives that were considered and the one that was chosen. Each plan decomposes the spec into file-by-file steps with acceptance criteria written before the code.
 
-Phase A3 — the data-adapter layer that became the 13 sources listed in the table above — was the clearest case of the sub-agent-parallel pattern paying off. I decomposed it into ten independent sub-plans: `sub01-watermarks-foundation`, `sub02-finviz-yahoo-fetch`, `sub03-edgar-xbrl-fundamentals`, `sub04-edgar-insider-and-filings`, `sub05-fred-finra`, `sub06-stockanalysis-ratios`, `sub07-openbb-router`, `sub07_5-rate-limited-orchestrator`, `sub08-news-activity-subsignals`, `sub09-lm-tone`, `sub10-yang-zhang-and-composite`. Each sub-plan had its own acceptance test that had to be written and red before any implementation code was allowed to land. Each ran as an independent sub-agent against its own slice of `src/` and `tests/`. Once all ten cleared their acceptance tests, an integration test (`tests/integration/test_a3_end_to_end.py`) ran the full pipeline against the populated database to confirm the slices fit together.
+The data-adapter layer (`src/common/datasources/`) is the clearest example. It decomposed into ten independent sub-plans — watermarks foundation, Finviz/Yahoo fetch, EDGAR XBRL fundamentals, EDGAR insider and filings, FRED + FINRA, StockAnalysis ratios, OpenBB router, the rate-limited orchestrator, news-activity sub-signals, the Loughran-McDonald tone module, and the Yang-Zhang volatility + composite signal. Each sub-plan had its own acceptance test that had to fail before any implementation code was allowed to land. An end-to-end integration test ([`tests/integration/test_a3_end_to_end.py`](tests/integration/test_a3_end_to_end.py)) confirmed the ten pieces fit together once they all cleared their unit tests.
 
-The test-first discipline is enforced by structure. Every adapter has a contract test before it has an implementation; `tests/` mirrors `src/` 1:1 — `src/methodology/yang_zhang_vol.py` has `tests/methodology/test_yang_zhang_vol.py`, every datasource adapter has a fetch test and a parser test, every Layer 3 module has its own integration test. Golden values for the technical indicators come from Wilder's and Appel's textbooks directly, not from another library. Where I implemented the LM dictionary tone signal, the test compares the count against the published Loughran-McDonald reference; where I implemented Yang-Zhang vol, the test cross-checks against Parkinson and Garman-Klass on synthetic GBM with a known volatility.
-
-The honest part: Claude wrote most of the code under my direction. I wrote the specs, picked the methodology, debated tradeoffs (why LightGBM over an LSTM, why triple-barrier over regression, why a 3-state HMM and not 2 or 4), reviewed every diff before merge, ran every test, and made the call on what was good enough to ship. The combination — me deciding what to build and why, Claude doing the typing under a strict test-first discipline — produced code faster than either of us alone, and produced code I can defend line-by-line. The differentiator is the workflow and the methodology, not the tool. Claude is a tool. The receipts under `docs/claude-code/` are there so a reviewer can audit the build process the same way they would audit the code.
+The test-first discipline is enforced by structure. `tests/` mirrors `src/` one-to-one. Every adapter has a contract test before it has an implementation. Golden values for the technical indicators are taken from Wilder's and Appel's textbooks directly rather than from another library. The Loughran-McDonald tone test compares against the published LM reference. The Yang-Zhang vol test cross-checks against Parkinson and Garman-Klass on synthetic geometric Brownian motion with a known volatility. Tests pass locally and in CI before any merge.
 
 ---
 
