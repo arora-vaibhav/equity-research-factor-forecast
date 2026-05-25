@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{{ ticker }} - Trade Identifier v2 - {{ as_of_date }}</title>
+<style>
+  :root {
+    /* Bloomberg-Terminal modernised dark (v8) */
+    --bg: #08090d; --bg2: #0d1017; --bg3: #131722; --bg-card: #161a25;
+    --fg: #e6e9ef; --fg2: #a0a8b8; --muted: #6b7280;
+    --accent: #4d9fff; --accent2: #f39f41;
+    --green: #26a69a; --green-bright: #4af6c3;
+    --red: #ef5350; --red-bright: #ff433d;
+    --orange: #fb8b1e; --cyan: #4af6c3; --warn: #f5c842;
+    --border: rgba(255,255,255,0.06); --border-strong: rgba(255,255,255,0.12);
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Consolas', ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--fg); margin: 0; padding: 20px;
+         font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+         font-size: 13px; font-weight: 500; line-height: 1.5;
+         -webkit-font-smoothing: antialiased;
+         font-feature-settings: 'tnum', 'cv11';
+         max-width: 1400px; margin: 0 auto; }
+  .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  h1 { color: var(--fg); font-size: 28px; margin-bottom: 4px; }
+  h2 { color: var(--accent); font-size: 18px; margin-top: 28px;
+       border-bottom: 1px solid var(--bg3); padding-bottom: 6px; }
+  .meta { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+  .meta strong { color: var(--fg2); }
+  .banner-warn { background: #7c1f1f; color: #fff; padding: 12px;
+                 border-radius: 6px; margin-bottom: 16px; font-weight: 600; }
+  .banner-info { background: var(--bg2); border: 1px solid var(--bg3);
+                 padding: 10px 12px; border-radius: 6px; margin-bottom: 14px;
+                 color: var(--fg2); font-size: 13px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .card { background: var(--bg2); border: 1px solid var(--bg3);
+          border-radius: 8px; padding: 14px; }
+  .card.full { width: 100%; }
+  .kv { display: flex; justify-content: space-between; padding: 4px 0;
+        border-bottom: 1px solid var(--bg3); font-size: 13px; }
+  .kv:last-child { border-bottom: none; }
+  .kv .k { color: var(--muted); }
+  .kv .v { color: var(--fg); font-weight: 500; }
+  .pos { color: var(--green); font-weight: 600; }
+  .neg { color: var(--red); font-weight: 600; }
+  .warn { color: var(--warn); font-weight: 600; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px;
+         font-size: 11px; font-weight: 600; }
+  .tag-green { background: #2a3a23; color: var(--green); }
+  .tag-red { background: #3a2330; color: var(--red); }
+  .tag-blue { background: #1f2a44; color: var(--accent); }
+  .tag-orange { background: #3a2e1c; color: var(--orange); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px;
+          margin-top: 8px; }
+  th, td { padding: 6px 8px; text-align: left;
+           border-bottom: 1px solid var(--bg3); }
+  th { background: var(--bg3); color: var(--fg2);
+       text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+  tbody tr:hover { background: var(--bg3); }
+  .narrative-card { background: var(--bg2); border-left: 3px solid var(--accent);
+                    padding: 12px 14px; margin-bottom: 8px; border-radius: 4px; }
+  .narrative-card.bull { border-left-color: var(--green); }
+  .narrative-card.bear { border-left-color: var(--red); }
+  .narrative-card.syn { border-left-color: var(--accent2); }
+  .narrative-card h3 { color: var(--fg); font-size: 13px; margin: 0 0 6px 0;
+                       text-transform: uppercase; letter-spacing: 0.6px; }
+  .risk-list { margin: 0; padding-left: 18px; color: var(--orange); }
+  .risk-list li { margin: 4px 0; }
+  .footer { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--bg3);
+            color: var(--muted); font-size: 11px; }
+  /* Mobile (phone) responsive overrides */
+  @media (max-width: 768px) {
+    body { padding: 12px; font-size: 14px; }
+    h1 { font-size: 22px; }
+    h2 { font-size: 16px; margin-top: 22px; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .card { padding: 10px; }
+    .kv { font-size: 12px; flex-direction: column; }
+    .kv .k { color: var(--muted); font-size: 11px; margin-bottom: 2px; }
+    .kv .v { font-size: 13px; }
+    table { font-size: 11px; }
+    th, td { padding: 4px 5px; }
+    /* Force horizontal scroll on wide tables instead of wrap-mess */
+    .card.full { overflow-x: auto; }
+    .meta { font-size: 11px; line-height: 1.6; }
+    .meta strong { display: inline-block; margin-right: 4px; }
+  }
+  @media (max-width: 480px) {
+    h1 { font-size: 18px; }
+    h2 { font-size: 14px; }
+    .meta { font-size: 10px; }
+  }
+</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+{% if is_synthetic %}
+<div class="banner-warn">
+  &#9888; SYNTHETIC-MODE REPORT &mdash; numbers are illustrative only and DO NOT reflect live market data.
+</div>
+{% endif %}
+
+<h1>{{ ticker }}{% if company_name %} &mdash; {{ company_name }}{% endif %}</h1>
+<div class="meta">
+  <strong>Report date:</strong> {{ as_of_date }} &nbsp;|&nbsp;
+  <strong>Sector:</strong> {{ sector or 'unknown' }} &nbsp;|&nbsp;
+  <strong>Last price:</strong> ${{ '{:,.2f}'.format(last_price) }} &nbsp;|&nbsp;
+  <strong>Horizon:</strong> {{ horizon_days }}d &nbsp;|&nbsp;
+  <strong>Generated:</strong> {{ generated_at }}
+</div>
+
+{% if not beats_random_walk %}
+<div class="banner-info" style="color: var(--warn);">
+  &#9888; Ensemble forecast does NOT meaningfully beat the random-walk baseline. Model edge is unclear; weight conviction accordingly.
+</div>
+{% endif %}
+
+<h2>Forecast summary</h2>
+<div class="grid-3">
+  <div class="card">
+    <div class="kv"><span class="k">Ensemble point</span>
+      <span class="v {% if ensemble_point >= 0 %}pos{% else %}neg{% endif %}">{{ '{:+.2%}'.format(ensemble_point) }}</span></div>
+    <div class="kv"><span class="k">80% CI</span>
+      <span class="v">[{{ '{:+.2%}'.format(ensemble_lower_80) }}, {{ '{:+.2%}'.format(ensemble_upper_80) }}]</span></div>
+    <div class="kv"><span class="k">95% CI</span>
+      <span class="v">[{{ '{:+.2%}'.format(ensemble_lower_95) }}, {{ '{:+.2%}'.format(ensemble_upper_95) }}]</span></div>
+    <div class="kv"><span class="k">Method dispersion</span>
+      <span class="v">{{ '{:.4f}'.format(method_dispersion) }}</span></div>
+    <div class="kv"><span class="k">Beats RW baseline</span>
+      <span class="v {% if beats_random_walk %}pos{% else %}warn{% endif %}">{{ 'YES' if beats_random_walk else 'NO' }}</span></div>
+  </div>
+  <div class="card">
+    <div class="kv"><span class="k">MC drift (annual)</span>
+      <span class="v">{{ '{:.2%}'.format(mc_drift) if mc_drift is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">MC sigma (annual)</span>
+      <span class="v">{{ '{:.2%}'.format(mc_sigma) if mc_sigma is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">MC paths</span>
+      <span class="v">{{ mc_n_paths }}</span></div>
+    <div class="kv"><span class="k">Bull target (90th pct)</span>
+      <span class="v pos">{{ '{:+.2%}'.format(bull_scenario_return) }} -> ${{ '{:,.2f}'.format(last_price * (1.0 + bull_scenario_return)) }}</span></div>
+    <div class="kv"><span class="k">Base target (50th)</span>
+      <span class="v">{{ '{:+.2%}'.format(base_scenario_return) }} -> ${{ '{:,.2f}'.format(last_price * (1.0 + base_scenario_return)) }}</span></div>
+    <div class="kv"><span class="k">Bear target (10th pct)</span>
+      <span class="v neg">{{ '{:+.2%}'.format(bear_scenario_return) }} -> ${{ '{:,.2f}'.format(last_price * (1.0 + bear_scenario_return)) }}</span></div>
+  </div>
+  <div class="card">
+    <div class="kv"><span class="k">Macro regime</span>
+      <span class="v"><span class="tag {% if macro.macro_regime == 'risk_off' %}tag-red{% elif macro.macro_regime == 'risk_on_growth' %}tag-green{% elif macro.macro_regime == 'risk_on_late' %}tag-orange{% else %}tag-blue{% endif %}">{{ macro.macro_regime }}</span></span></div>
+    <div class="kv"><span class="k">10y yield</span>
+      <span class="v">{{ '{:.2f}%'.format(macro.tnx_yield) if macro.tnx_yield == macro.tnx_yield else '-' }}</span></div>
+    <div class="kv"><span class="k">3m yield</span>
+      <span class="v">{{ '{:.2f}%'.format(macro.irx_yield) if macro.irx_yield == macro.irx_yield else '-' }}</span></div>
+    <div class="kv"><span class="k">Yield-curve slope</span>
+      <span class="v">{{ '{:+.2f}%'.format(macro.yield_curve_slope) if macro.yield_curve_slope == macro.yield_curve_slope else '-' }}</span></div>
+    <div class="kv"><span class="k">VIX level</span>
+      <span class="v">{{ '{:.2f}'.format(macro.vix_level) if macro.vix_level == macro.vix_level else '-' }}</span></div>
+    <div class="kv"><span class="k">VIX z-score (252d)</span>
+      <span class="v">{{ '{:+.2f}'.format(macro.vix_z_score_252d) if macro.vix_z_score_252d == macro.vix_z_score_252d else '-' }}</span></div>
+    <div class="kv"><span class="k">Sector ETF</span>
+      <span class="v">{{ macro.sector_etf or '-' }}</span></div>
+    <div class="kv"><span class="k">Sector relative (90d)</span>
+      <span class="v">{{ '{:+.2%}'.format(macro.sector_relative_return_90d) if macro.sector_relative_return_90d == macro.sector_relative_return_90d else '-' }}</span></div>
+  </div>
+</div>
+
+<h2>Forecast plot (interactive)</h2>
+<div class="card full">{{ forecast_fan_html | safe }}</div>
+
+<h2>Realised volatility</h2>
+<div class="card full">
+  <div class="kv"><span class="k">Yang-Zhang annualized (60d)</span>
+    <span class="v">{{ '{:.2%}'.format(realized_vol_yang_zhang) if realized_vol_yang_zhang is not none else '-' }}</span></div>
+  <div class="kv"><span class="k">Close-to-close annualized (60d)</span>
+    <span class="v">{{ '{:.2%}'.format(realized_vol_close_to_close) if realized_vol_close_to_close is not none else '-' }}</span></div>
+</div>
+
+<h2>Per-method comparison</h2>
+<div class="card full">
+  <table>
+    <thead><tr><th>Method</th><th>Weight</th><th>Point</th><th>80% lo</th><th>80% hi</th><th>95% lo</th><th>95% hi</th></tr></thead>
+    <tbody>
+    {% for m in method_rows %}
+      <tr>
+        <td><span class="tag tag-blue">{{ m.method }}</span></td>
+        <td>{{ '{:.1%}'.format(m.weight) }}</td>
+        <td class="{% if m.point_return >= 0 %}pos{% else %}neg{% endif %}">{{ '{:+.2%}'.format(m.point_return) }}</td>
+        <td>{{ '{:+.2%}'.format(m.lower_80) }}</td>
+        <td>{{ '{:+.2%}'.format(m.upper_80) }}</td>
+        <td>{{ '{:+.2%}'.format(m.lower_95) }}</td>
+        <td>{{ '{:+.2%}'.format(m.upper_95) }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2>Factor contributions (interactive waterfall)</h2>
+<div class="card full">{{ waterfall_html | safe }}</div>
+
+<h2>Factor contribution table</h2>
+<div class="card full">
+  <table>
+    <thead><tr><th>Factor</th><th>Loading</th><th>Ticker value</th><th>Contribution</th></tr></thead>
+    <tbody>
+    {% for r in factor_table %}
+      <tr>
+        <td>{{ r.factor }}</td>
+        <td>{{ '{:+.4f}'.format(r.loading) if r.loading is not none else '-' }}</td>
+        <td>{{ '{:+.4f}'.format(r.value) if r.value is not none else '-' }}</td>
+        <td class="{% if r.contribution >= 0 %}pos{% else %}neg{% endif %}">{{ '{:+.4f}'.format(r.contribution) }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2>Factor decay over horizon</h2>
+<div class="card full">{{ decay_html | safe }}</div>
+
+{% if ic_html %}
+<h2>Factor IC over time</h2>
+<div class="card full">{{ ic_html | safe }}</div>
+{% endif %}
+
+{% if ic_table_rows %}
+<h2>Per-factor IC backtest summary</h2>
+<div class="card full">
+  <table>
+    <thead><tr><th>Factor</th><th>Mean IC</th><th>ICIR</th><th>% positive</th><th>Cumulative attribution</th><th>n periods</th></tr></thead>
+    <tbody>
+    {% for r in ic_table_rows %}
+      <tr>
+        <td>{{ r.factor }}</td>
+        <td class="{% if r.mean_ic and r.mean_ic > 0 %}pos{% elif r.mean_ic and r.mean_ic < 0 %}neg{% endif %}">{{ '{:+.4f}'.format(r.mean_ic) if r.mean_ic is not none else '-' }}</td>
+        <td>{{ '{:+.3f}'.format(r.icir) if r.icir is not none else '-' }}</td>
+        <td>{{ '{:.1%}'.format(r.fraction_positive) if r.fraction_positive is not none else '-' }}</td>
+        <td>{{ '{:+.4f}'.format(r.cumulative_attribution) if r.cumulative_attribution is not none else '-' }}</td>
+        <td>{{ r.n_periods if r.n_periods is not none else '-' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% if descriptive_stats %}
+<h2>Snapshot &mdash; fundamentals + technical</h2>
+<div class="grid-3">
+  <div class="card">
+    <div class="kv"><span class="k">Market cap</span>
+      <span class="v">{{ descriptive_stats.market_cap_display or '-' }}</span></div>
+    <div class="kv"><span class="k">P/E (trailing)</span>
+      <span class="v">{{ descriptive_stats.pe or '-' }}</span></div>
+    <div class="kv"><span class="k">P/B</span>
+      <span class="v">{{ descriptive_stats.pb or '-' }}</span></div>
+    <div class="kv"><span class="k">Forward P/E</span>
+      <span class="v">{{ descriptive_stats.forward_pe or '-' }}</span></div>
+    <div class="kv"><span class="k">PEG</span>
+      <span class="v">{{ descriptive_stats.peg or '-' }}</span></div>
+    <div class="kv"><span class="k">Dividend yield</span>
+      <span class="v">{{ descriptive_stats.dividend_yield or '-' }}</span></div>
+    <div class="kv"><span class="k">Beta</span>
+      <span class="v">{{ descriptive_stats.beta or '-' }}</span></div>
+  </div>
+  <div class="card">
+    <div class="kv"><span class="k">52w high / low</span>
+      <span class="v">{{ descriptive_stats.fifty_two_week_high or '-' }} / {{ descriptive_stats.fifty_two_week_low or '-' }}</span></div>
+    <div class="kv"><span class="k">Distance from 52w high</span>
+      <span class="v">{{ descriptive_stats.distance_from_52w_high or '-' }}</span></div>
+    <div class="kv"><span class="k">RSI(14)</span>
+      <span class="v">{{ descriptive_stats.rsi_14 or '-' }}</span></div>
+    <div class="kv"><span class="k">SMA50 / SMA200</span>
+      <span class="v">{{ descriptive_stats.sma50 or '-' }} / {{ descriptive_stats.sma200 or '-' }}</span></div>
+    <div class="kv"><span class="k">ATR(14)</span>
+      <span class="v">{{ descriptive_stats.atr_14 or '-' }}</span></div>
+    <div class="kv"><span class="k">Avg volume (20d)</span>
+      <span class="v">{{ descriptive_stats.avg_volume or '-' }}</span></div>
+  </div>
+  <div class="card">
+    <div class="kv"><span class="k">Profit margin</span>
+      <span class="v">{{ descriptive_stats.profit_margin or '-' }}</span></div>
+    <div class="kv"><span class="k">ROE</span>
+      <span class="v">{{ descriptive_stats.roe or '-' }}</span></div>
+    <div class="kv"><span class="k">Revenue growth (YoY)</span>
+      <span class="v">{{ descriptive_stats.revenue_growth or '-' }}</span></div>
+    <div class="kv"><span class="k">Earnings growth (YoY)</span>
+      <span class="v">{{ descriptive_stats.earnings_growth or '-' }}</span></div>
+    <div class="kv"><span class="k">Debt/Equity</span>
+      <span class="v">{{ descriptive_stats.debt_to_equity or '-' }}</span></div>
+    <div class="kv"><span class="k">Current ratio</span>
+      <span class="v">{{ descriptive_stats.current_ratio or '-' }}</span></div>
+    <div class="kv"><span class="k">Short ratio</span>
+      <span class="v">{{ descriptive_stats.short_ratio or '-' }}</span></div>
+  </div>
+</div>
+{% endif %}
+
+{% if walk_forward and walk_forward.horizons %}
+<h2>Forecast accuracy &mdash; walk-forward backtest (60d lookback)</h2>
+<div class="banner-info">
+  Walk-forward backtest on this ticker's last ~3 years of price history. For each anchor t,
+  we re-fit on the previous 60 days and predict t+1 / t+30 / t+60. Then we compare to the
+  realised price. Reference benchmark: PMC9680880 LASSO-LSTM on AAPL/MSFT/BAC = 71.6%-77.2%
+  1d directional accuracy. n_walks = {{ walk_forward.n_walks }}.
+</div>
+<div class="card full">
+  <table>
+    <thead><tr><th>Horizon</th><th>n predictions</th><th>Directional accuracy</th><th>MAE (return)</th><th>RMSE</th><th>80% CI hit rate</th><th>Pearson(pred, real)</th></tr></thead>
+    <tbody>
+    {% for h in walk_forward.horizons %}
+      <tr>
+        <td><b>{{ h.horizon_days }}d</b></td>
+        <td>{{ h.n_predictions }}</td>
+        <td class="{% if h.directional_accuracy > 0.55 %}pos{% elif h.directional_accuracy < 0.45 %}neg{% endif %}">{{ '{:.1%}'.format(h.directional_accuracy) }}</td>
+        <td>{{ '{:.2%}'.format(h.mae_return) }}</td>
+        <td>{{ '{:.2%}'.format(h.rmse_return) }}</td>
+        <td>{{ '{:.1%}'.format(h.ci80_hit_rate) }}</td>
+        <td class="{% if h.pearson_pred_vs_realized > 0 %}pos{% else %}neg{% endif %}">{{ '{:+.3f}'.format(h.pearson_pred_vs_realized) }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% if volume_composite and volume_composite.get('n_signals', 0) > 0 %}
+<h2>Volume momentum (Granville / CGW / Quong-Soudack)</h2>
+<div class="banner-info">
+  Volume confirms price moves (Campbell-Grossman-Wang 1993 <i>RFS</i>). High-volume moves are more
+  informative than low-volume moves. Composite z-score is the mean of standardised features clipped
+  to &plusmn;3 (Grinold-Kahn 2000 ch.3).
+</div>
+<div class="grid-3">
+  <div class="card">
+    <div class="kv"><span class="k">Composite z</span>
+      <span class="v {% if volume_composite.get('composite', 0) >= 0 %}pos{% else %}neg{% endif %}">{{ '{:+.3f}'.format(volume_composite.get('composite', 0.0)) }}</span></div>
+    <div class="kv"><span class="k">Active signals</span>
+      <span class="v">{{ volume_composite.get('n_signals', 0) }} of 7</span></div>
+    <div class="kv"><span class="k">MFI(14)</span>
+      <span class="v">{{ '{:.2f}'.format(volume_composite.get('mfi', 0.0)) if volume_composite.get('mfi') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">CMF(20)</span>
+      <span class="v">{{ '{:+.4f}'.format(volume_composite.get('cmf', 0.0)) if volume_composite.get('cmf') is not none else '-' }}</span></div>
+  </div>
+  <div class="card">
+    <div class="kv"><span class="k">OBV z (252d)</span>
+      <span class="v">{{ '{:+.3f}'.format(volume_composite.get('obv_z', 0.0)) if volume_composite.get('obv_z') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">VPT z (252d)</span>
+      <span class="v">{{ '{:+.3f}'.format(volume_composite.get('vpt_z', 0.0)) if volume_composite.get('vpt_z') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">VW-momentum z</span>
+      <span class="v">{{ '{:+.3f}'.format(volume_composite.get('vwmom_z', 0.0)) if volume_composite.get('vwmom_z') is not none else '-' }}</span></div>
+  </div>
+  <div class="card">
+    <div class="kv"><span class="k">Volume z (60d)</span>
+      <span class="v">{{ '{:+.3f}'.format(volume_composite.get('volume_z_z', 0.0)) if volume_composite.get('volume_z_z') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">Relative volume (vs 20d ADV)</span>
+      <span class="v">{{ '{:.2f}x'.format(volume_composite.get('rel_volume', 0.0)) if volume_composite.get('rel_volume') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">CMF z (252d)</span>
+      <span class="v">{{ '{:+.3f}'.format(volume_composite.get('cmf_z', 0.0)) if volume_composite.get('cmf_z') is not none else '-' }}</span></div>
+  </div>
+</div>
+{% endif %}
+
+{% if sector_features %}
+<h2>Sector rotation &amp; AI-spillover (v6)</h2>
+<div class="grid-3">
+  <div class="card">
+    <div class="kv"><span class="k">Sector ETF</span>
+      <span class="v">{{ sector_features.sector_etf or '-' }}</span></div>
+    <div class="kv"><span class="k">Rel-return 5d / 20d / 60d</span>
+      <span class="v">
+        {{ '{:+.2%}'.format(sector_features.rel_ret_5d) if sector_features.rel_ret_5d == sector_features.rel_ret_5d else '-' }}
+        / {{ '{:+.2%}'.format(sector_features.rel_ret_20d) if sector_features.rel_ret_20d == sector_features.rel_ret_20d else '-' }}
+        / {{ '{:+.2%}'.format(sector_features.rel_ret_60d) if sector_features.rel_ret_60d == sector_features.rel_ret_60d else '-' }}
+      </span></div>
+    <div class="kv"><span class="k">Sector mom-z 1m / 3m / 6m</span>
+      <span class="v">
+        {{ '{:+.2f}'.format(sector_features.sector_mom_1m_z) if sector_features.sector_mom_1m_z == sector_features.sector_mom_1m_z else '-' }}
+        / {{ '{:+.2f}'.format(sector_features.sector_mom_3m_z) if sector_features.sector_mom_3m_z == sector_features.sector_mom_3m_z else '-' }}
+        / {{ '{:+.2f}'.format(sector_features.sector_mom_6m_z) if sector_features.sector_mom_6m_z == sector_features.sector_mom_6m_z else '-' }}
+      </span></div>
+    <div class="kv"><span class="k">Rotation phase</span>
+      <span class="v"><span class="tag {% if sector_features.sector_rotation_phase == 'cyclical' %}tag-green{% elif sector_features.sector_rotation_phase == 'defensive' %}tag-red{% else %}tag-blue{% endif %}">{{ sector_features.sector_rotation_phase }}</span></span></div>
+  </div>
+  <div class="card">
+    <div class="kv"><span class="k">AI-factor beta (60d)</span>
+      <span class="v {% if sector_features.ai_factor_beta_60d == sector_features.ai_factor_beta_60d and sector_features.ai_factor_beta_60d >= 0 %}pos{% elif sector_features.ai_factor_beta_60d == sector_features.ai_factor_beta_60d %}neg{% endif %}">
+        {{ '{:+.3f}'.format(sector_features.ai_factor_beta_60d) if sector_features.ai_factor_beta_60d == sector_features.ai_factor_beta_60d else '-' }}</span></div>
+    <div class="kv"><span class="k">AI spillover score</span>
+      <span class="v {% if sector_features.ai_spillover_score == sector_features.ai_spillover_score and sector_features.ai_spillover_score >= 0 %}pos{% elif sector_features.ai_spillover_score == sector_features.ai_spillover_score %}neg{% endif %}">
+        {{ '{:+.4f}'.format(sector_features.ai_spillover_score) if sector_features.ai_spillover_score == sector_features.ai_spillover_score else '-' }}</span></div>
+    <div class="kv"><span class="k">Risk-off corr regime (60d)</span>
+      <span class="v">{{ '{:.2f}'.format(sector_features.risk_off_corr_regime) if sector_features.risk_off_corr_regime == sector_features.risk_off_corr_regime else '-' }}
+        <small style="color:var(--muted);">(&gt;0.6 = risk-off; &lt;0.35 = stock-picking)</small></span></div>
+  </div>
+  <div class="card">
+    <div class="kv"><span class="k">Sector breadth (% &gt; SMA50)</span>
+      <span class="v">{{ '{:.1%}'.format(sector_features.sector_breadth) if sector_features.sector_breadth == sector_features.sector_breadth else '-' }}</span></div>
+    <div class="kv"><span class="k">Sector dispersion 20d</span>
+      <span class="v">{{ '{:.4f}'.format(sector_features.sector_dispersion_20d) if sector_features.sector_dispersion_20d == sector_features.sector_dispersion_20d else '-' }}</span></div>
+  </div>
+</div>
+{% endif %}
+
+{# Peer comparison -- decision-input panel. #}
+{% if peer_comparison %}
+<h2>Peer comparison (sector-relative valuation &amp; momentum)</h2>
+<div class="card full" style="margin-bottom: 8px;">
+  <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">
+    <div style="flex: 1 1 240px; min-width: 240px;">
+      <div style="font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase;">
+        Peer signal
+      </div>
+      <div style="font-size: 20px; font-weight: 700; letter-spacing: 0.5px;
+        color: {% if peer_comparison.peer_signal == 'cheap_leader' %}var(--green-bright)
+              {% elif peer_comparison.peer_signal == 'expensive_laggard' %}var(--red-bright)
+              {% elif peer_comparison.peer_signal in ('cheap_laggard', 'expensive_leader') %}var(--accent2)
+              {% else %}var(--fg2){% endif %};">
+        {{ peer_comparison.peer_signal.upper().replace('_', ' ') }}
+      </div>
+      <div style="font-size: 12px; color: var(--fg2); margin-top: 4px;">
+        score {{ '{:+.2f}'.format(peer_comparison.peer_score) }}
+        ({{ peer_comparison.n_peers }} peers)
+      </div>
+    </div>
+    <div style="flex: 1 1 200px; min-width: 200px;">
+      <div style="font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase;">
+        P/E percentile
+      </div>
+      <div style="font-size: 18px; font-weight: 700;" class="num">
+        {% if peer_comparison.pe_percentile is not none %}
+        {{ '{:.0%}'.format(peer_comparison.pe_percentile) }}
+        <span style="font-size: 10px; color: var(--muted); font-weight: 400; margin-left: 6px;">
+          ({{ '{:.0%} cheaper than this'.format(peer_comparison.pe_percentile) }})
+        </span>
+        {% else %}-{% endif %}
+      </div>
+    </div>
+    <div style="flex: 1 1 200px; min-width: 200px;">
+      <div style="font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase;">
+        20d momentum percentile
+      </div>
+      <div style="font-size: 18px; font-weight: 700;" class="num">
+        {% if peer_comparison.momentum_percentile is not none %}
+        {{ '{:.0%}'.format(peer_comparison.momentum_percentile) }}
+        <span style="font-size: 10px; color: var(--muted); font-weight: 400; margin-left: 6px;">
+          ({{ '{:.0%} lag this'.format(peer_comparison.momentum_percentile) }})
+        </span>
+        {% else %}-{% endif %}
+      </div>
+    </div>
+    <div style="flex: 1 1 200px; min-width: 200px;">
+      <div style="font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase;">
+        Market-cap percentile
+      </div>
+      <div style="font-size: 18px; font-weight: 700;" class="num">
+        {% if peer_comparison.mcap_percentile is not none %}
+        {{ '{:.0%}'.format(peer_comparison.mcap_percentile) }}
+        {% else %}-{% endif %}
+      </div>
+    </div>
+  </div>
+  {% if peer_comparison.peers %}
+  <div style="margin-top: 14px;">
+    <div style="font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">
+      Peer set (mcap band 0.2x-5x, same sector)
+    </div>
+    <div style="font-family: var(--font-mono); font-size: 12px;">
+      {% for p in peer_comparison.peers %}<span class="tag tag-blue">{{ p }}</span> {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  {% if peer_comparison.notes %}
+  <div style="font-size: 11px; color: var(--muted); margin-top: 10px;">
+    {{ peer_comparison.notes }}
+  </div>
+  {% endif %}
+  <div style="font-size: 10px; color: var(--muted); margin-top: 6px; line-height: 1.4;">
+    Decision input: <b>cheap_leader</b> &rarr; nudge bias one bucket toward LONG;
+    <b>expensive_laggard</b> &rarr; nudge toward SHORT;
+    <b>cheap_laggard</b> = value-trap (neutralize);
+    <b>expensive_leader</b> = crowding risk (neutralize).
+    Folded into Claude critique and one-line PM summary.
+  </div>
+</div>
+{% endif %}
+
+{% if mtf_snapshots %}
+<h2>Multi-timeframe technical analysis (1wk / 1d / 1h)</h2>
+<div class="card full" style="margin-bottom: 8px;">
+  <div style="color: var(--muted); font-size: 12px;">
+    Per-timeframe verdict (TradingView-style aggregate of 17 indicators:
+    RSI, MACD, BBands, ADX, Stoch, %R, OBV, MFI, CMF, ATR, SMA50/200,
+    EMA9/21, Donchian, price-vs-SMA200). Counts = how many indicators
+    fired BUY / SELL / NEUTRAL; net strength is the weight-sum delta.
+    Crosses (golden/death, MACD signal cross, Donchian breakout) and
+    the SMA200 trend filter carry 1.5x weight.
+  </div>
+</div>
+{# TradingView-style verdict strip -- headline buy/sell/neutral number. #}
+{% if ta_panel %}
+<div class="card full" style="margin-bottom: 8px; padding: 12px 16px;">
+  <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">
+    {% for tf in ['1wk', '1d', '1h'] %}{% set v = ta_panel.get(tf) %}{% if v %}
+    <div style="flex: 1 1 200px; min-width: 200px;">
+      <div style="font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase;">
+        {{ tf }} verdict
+      </div>
+      <div style="font-size: 22px; font-weight: 700; letter-spacing: 0.5px;
+        color: {% if 'STRONG BUY' in v.label %}var(--green-bright)
+              {% elif v.label == 'BUY' %}var(--green)
+              {% elif 'STRONG SELL' in v.label %}var(--red-bright)
+              {% elif v.label == 'SELL' %}var(--red)
+              {% else %}var(--fg2){% endif %};">
+        {{ v.label }}
+      </div>
+      <div style="font-size: 12px; color: var(--fg2); margin-top: 2px;" class="num">
+        <span style="color: var(--green);">{{ v.buy_count }} buy</span>
+        / <span style="color: var(--red);">{{ v.sell_count }} sell</span>
+        / <span style="color: var(--muted);">{{ v.neutral_count }} neutral</span>
+        &middot; net {{ '{:+.1f}'.format(v.net_strength) }}
+      </div>
+    </div>
+    {% endif %}{% endfor %}
+  </div>
+</div>
+{% endif %}
+<div class="grid-3">
+  {% for tf in ['1wk', '1d', '1h'] %}
+  {% set s = mtf_snapshots.get(tf, {}) %}
+  {% set v = ta_panel.get(tf) if ta_panel else None %}
+  <div class="card">
+    <h3 style="color: var(--accent2); margin-top: 0; display: flex; align-items: baseline; gap: 8px;">
+      <span>{{ tf }}</span>
+      {% if v %}
+      <span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 3px; letter-spacing: 0.4px;
+        background: {% if 'STRONG BUY' in v.label %}rgba(74,246,195,0.16)
+                    {% elif v.label == 'BUY' %}rgba(38,166,154,0.16)
+                    {% elif 'STRONG SELL' in v.label %}rgba(255,67,61,0.18)
+                    {% elif v.label == 'SELL' %}rgba(239,83,80,0.16)
+                    {% else %}rgba(160,168,184,0.12){% endif %};
+        color: {% if 'STRONG BUY' in v.label %}var(--green-bright)
+              {% elif v.label == 'BUY' %}var(--green)
+              {% elif 'STRONG SELL' in v.label %}var(--red-bright)
+              {% elif v.label == 'SELL' %}var(--red)
+              {% else %}var(--fg2){% endif %};">
+        {{ v.label }}
+      </span>
+      <span style="font-size: 10px; color: var(--muted);" class="num">
+        {{ v.buy_count }}/{{ v.sell_count }}/{{ v.neutral_count }}
+      </span>
+      {% endif %}
+    </h3>
+    {% if s.get('available') %}
+    <div class="kv"><span class="k">RSI(14)</span>
+      <span class="v {% if s.get('rsi_14') and s.rsi_14 > 70 %}neg{% elif s.get('rsi_14') and s.rsi_14 < 30 %}pos{% endif %}">
+        {{ '{:.1f}'.format(s.rsi_14) if s.get('rsi_14') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">MACD hist</span>
+      <span class="v {% if s.get('macd_hist') and s.macd_hist >= 0 %}pos{% else %}neg{% endif %}">{{ '{:+.4f}'.format(s.macd_hist) if s.get('macd_hist') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">Bollinger %b</span>
+      <span class="v">{{ '{:.2f}'.format(s.bb_pctb) if s.get('bb_pctb') is not none else '-' }}{% if s.get('bb_squeeze') %} <span class="tag tag-orange">SQUEEZE</span>{% endif %}</span></div>
+    <div class="kv"><span class="k">ADX(14)</span>
+      <span class="v">{{ '{:.1f}'.format(s.adx_14) if s.get('adx_14') is not none else '-' }}{% if s.get('adx_rising') %} <span class="tag tag-blue">RISING</span>{% endif %}</span></div>
+    <div class="kv"><span class="k">ATR %</span>
+      <span class="v">{{ '{:.2%}'.format(s.atr_pct) if s.get('atr_pct') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">MFI(14) / CMF(20)</span>
+      <span class="v">{{ '{:.1f}'.format(s.mfi_14) if s.get('mfi_14') is not none else '-' }}
+        / {{ '{:+.3f}'.format(s.cmf_20) if s.get('cmf_20') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">Donchian pos / break</span>
+      <span class="v">{{ '{:.2f}'.format(s.donch_pos_20) if s.get('donch_pos_20') is not none else '-' }}{% if s.get('donch_break_up') %} <span class="tag tag-green">UP</span>{% endif %}{% if s.get('donch_break_dn') %} <span class="tag tag-red">DN</span>{% endif %}</span></div>
+    {% if s.get('price_above_sma200') is defined %}
+    <div class="kv"><span class="k">vs SMA200</span>
+      <span class="v">{% if s.price_above_sma200 %}<span class="tag tag-green">ABOVE</span>{% else %}<span class="tag tag-red">BELOW</span>{% endif %}</span></div>
+    {% endif %}
+    <div class="kv"><span class="k">n_bars</span><span class="v">{{ s.get('n_bars', '-') }}</span></div>
+    {% else %}
+    <div style="color: var(--muted); font-size: 12px;">no data (yfinance interval may exceed lookback cap)</div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% if mtf_confluence %}
+<div class="card full" style="margin-top: 8px;">
+  <h3 style="color: var(--accent2); margin-top: 0;">Cross-timeframe confluence</h3>
+  <div class="kv"><span class="k">Confluence LONG (0-1)</span>
+    <span class="v {% if mtf_confluence.get('confluence_long', 0) > 0 %}pos{% else %}muted{% endif %}">{{ '{:.2f}'.format(mtf_confluence.get('confluence_long', 0.0)) }}</span></div>
+  <div class="kv"><span class="k">Confluence SHORT (0-1)</span>
+    <span class="v {% if mtf_confluence.get('confluence_short', 0) > 0 %}neg{% else %}muted{% endif %}">{{ '{:.2f}'.format(mtf_confluence.get('confluence_short', 0.0)) }}</span></div>
+
+  <div style="color: var(--muted); font-size: 11px; margin-top: 10px;">
+    Patterns are intentionally selective (Elder triple-screen, daily/hourly
+    divergence, BB-squeeze+breakout, SMA-alignment, MACD/OBV). Most tickers
+    fire 0-2 patterns on any given day. Below: each pattern with its
+    current state (&#x2713; firing / &#x2717; not firing).
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 10px;">
+    <div>
+      <div style="font-size: 10px; color: var(--green); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Long patterns</div>
+      {% for k, v in mtf_confluence.items() %}{% if k.startswith('long_') %}
+      <div style="display: flex; gap: 8px; align-items: center; padding: 3px 0; font-size: 11px;">
+        <span style="color: {% if v == 1 %}var(--green-bright){% else %}var(--muted){% endif %}; width: 12px;">{% if v == 1 %}&#x2713;{% else %}&#x2717;{% endif %}</span>
+        <span style="color: {% if v == 1 %}var(--fg){% else %}var(--fg2){% endif %}; font-family: var(--font-mono);">{{ k[5:] }}</span>
+      </div>
+      {% endif %}{% endfor %}
+    </div>
+    <div>
+      <div style="font-size: 10px; color: var(--red); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Short patterns</div>
+      {% for k, v in mtf_confluence.items() %}{% if k.startswith('short_') %}
+      <div style="display: flex; gap: 8px; align-items: center; padding: 3px 0; font-size: 11px;">
+        <span style="color: {% if v == 1 %}var(--red-bright){% else %}var(--muted){% endif %}; width: 12px;">{% if v == 1 %}&#x2713;{% else %}&#x2717;{% endif %}</span>
+        <span style="color: {% if v == 1 %}var(--fg){% else %}var(--fg2){% endif %}; font-family: var(--font-mono);">{{ k[6:] }}</span>
+      </div>
+      {% endif %}{% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endif %}
+
+{% if fmp_ratios or fmp_revisions_info %}
+<h2>FMP fundamentals &amp; analyst consensus (v7)</h2>
+<div class="grid-3">
+  <div class="card">
+    <h3 style="color: var(--accent2); margin-top: 0;">Quality / leverage</h3>
+    <div class="kv"><span class="k">ROE</span>
+      <span class="v">{{ '{:.1%}'.format(fmp_ratios.roe) if fmp_ratios.get('roe') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">ROIC</span>
+      <span class="v">{{ '{:.1%}'.format(fmp_ratios.roic) if fmp_ratios.get('roic') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">FCF yield</span>
+      <span class="v">{{ '{:.1%}'.format(fmp_ratios.fcf_yield) if fmp_ratios.get('fcf_yield') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">Debt / EBITDA</span>
+      <span class="v">{{ '{:.2f}'.format(fmp_ratios.debt_to_ebitda) if fmp_ratios.get('debt_to_ebitda') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">Current ratio</span>
+      <span class="v">{{ '{:.2f}'.format(fmp_ratios.current_ratio) if fmp_ratios.get('current_ratio') is not none else '-' }}</span></div>
+  </div>
+  <div class="card">
+    <h3 style="color: var(--accent2); margin-top: 0;">Margins / valuation</h3>
+    <div class="kv"><span class="k">Gross margin</span>
+      <span class="v">{{ '{:.1%}'.format(fmp_ratios.gross_margin) if fmp_ratios.get('gross_margin') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">Operating margin</span>
+      <span class="v">{{ '{:.1%}'.format(fmp_ratios.op_margin) if fmp_ratios.get('op_margin') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">Net margin</span>
+      <span class="v">{{ '{:.1%}'.format(fmp_ratios.net_margin) if fmp_ratios.get('net_margin') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">P/E (TTM)</span>
+      <span class="v">{{ '{:.1f}'.format(fmp_ratios.pe) if fmp_ratios.get('pe') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">EV / EBITDA</span>
+      <span class="v">{{ '{:.1f}'.format(fmp_ratios.ev_ebitda) if fmp_ratios.get('ev_ebitda') is not none else '-' }}</span></div>
+  </div>
+  <div class="card">
+    <h3 style="color: var(--accent2); margin-top: 0;">Analyst consensus</h3>
+    <div class="kv"><span class="k">Target mean</span>
+      <span class="v">{{ '${:,.2f}'.format(fmp_revisions_info.target_mean) if fmp_revisions_info.get('target_mean') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">Target high / low</span>
+      <span class="v">{{ '${:,.2f}'.format(fmp_revisions_info.target_high) if fmp_revisions_info.get('target_high') is not none else '-' }}
+        / {{ '${:,.2f}'.format(fmp_revisions_info.target_low) if fmp_revisions_info.get('target_low') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">Upside vs last close</span>
+      <span class="v {% if fmp_revisions_info.get('upside_pct') and fmp_revisions_info.upside_pct >= 0 %}pos{% else %}neg{% endif %}">{{ '{:+.1%}'.format(fmp_revisions_info.upside_pct) if fmp_revisions_info.get('upside_pct') is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">Revisions score</span>
+      <span class="v {% if fmp_revisions_info.get('revisions_score') and fmp_revisions_info.revisions_score >= 0 %}pos{% else %}neg{% endif %}">{{ '{:+.3f}'.format(fmp_revisions_info.revisions_score) if fmp_revisions_info.get('revisions_score') is not none else '-' }}</span></div>
+  </div>
+</div>
+{% endif %}
+
+{% if bias %}
+<h2>Trade-bias signal &mdash; foundation for trade-guidance layer</h2>
+<div class="grid-3">
+  <div class="card">
+    <div class="kv"><span class="k">Bias</span>
+      <span class="v"><span class="tag {% if bias.bias == 'LONG' %}tag-green{% elif bias.bias == 'SHORT' %}tag-red{% else %}tag-blue{% endif %}">{{ bias.bias }}</span></span></div>
+    <div class="kv"><span class="k">Composite z-score</span>
+      <span class="v {% if bias.composite_z >= 0 %}pos{% else %}neg{% endif %}">{{ '{:+.3f}'.format(bias.composite_z) }}</span></div>
+    <div class="kv"><span class="k">Conviction</span>
+      <span class="v">{{ bias.conviction }}</span></div>
+    <div class="kv"><span class="k">Recommended playbook</span>
+      <span class="v">{{ bias.recommended_playbook }}</span></div>
+    {% if bias.macro_override %}
+    <div class="kv"><span class="k">Macro override</span>
+      <span class="v warn">{{ bias.macro_override }}</span></div>
+    {% endif %}
+  </div>
+  <div class="card">
+    <div class="kv"><span class="k">Strategies on bias side</span>
+      <span class="v"></span></div>
+    {% for s in bias.suggested_strategies %}
+    <div class="kv"><span class="k">&bull;</span><span class="v">{{ s }}</span></div>
+    {% endfor %}
+  </div>
+  <div class="card">
+    <div class="kv"><span class="k">Why this bias</span><span class="v"></span></div>
+    <div style="color: var(--fg2); font-size: 12px; line-height: 1.5;">{{ bias.reasoning }}</div>
+  </div>
+</div>
+{% endif %}
+
+{% if sensitivity %}
+<h2>Sensitivity (OFAT tornado &plusmn;1 sd) and stress scenarios</h2>
+<div class="card full">{{ tornado_html | safe }}</div>
+<div class="card full" style="margin-top: 12px;">
+  <table>
+    <thead><tr><th>Factor</th><th>Loading w<sub>i</sub></th><th>Ticker z-value</th><th>+1 sd impact</th><th>-1 sd impact</th></tr></thead>
+    <tbody>
+    {% for r in sensitivity.factor_sensitivities %}
+      <tr>
+        <td>{{ r.factor }}</td>
+        <td>{{ '{:+.4f}'.format(r.loading) }}</td>
+        <td>{{ '{:+.3f}'.format(r.ticker_value) }}</td>
+        <td class="{% if r.impact_plus_1sd >= 0 %}pos{% else %}neg{% endif %}">{{ '{:+.4f}'.format(r.impact_plus_1sd) }}</td>
+        <td class="{% if r.impact_minus_1sd >= 0 %}pos{% else %}neg{% endif %}">{{ '{:+.4f}'.format(r.impact_minus_1sd) }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div class="card full" style="margin-top: 12px;">
+  <h3 style="color: var(--accent2); margin-top: 0;">Stress scenarios (forecast shift from base point)</h3>
+  <table>
+    <thead><tr><th>Scenario</th><th>Description</th><th>Stressed point</th><th>Delta vs base</th></tr></thead>
+    <tbody>
+    {% for s in sensitivity.stress_scenarios %}
+      <tr>
+        <td><span class="tag tag-orange">{{ s.name }}</span></td>
+        <td>{{ s.description }}</td>
+        <td class="{% if s.impact >= 0 %}pos{% else %}neg{% endif %}">{{ '{:+.2%}'.format(s.impact) }}</td>
+        <td class="{% if (s.impact - sensitivity.base_point_return) >= 0 %}pos{% else %}neg{% endif %}">{{ '{:+.2%}'.format(s.impact - sensitivity.base_point_return) }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% if sentiment %}
+<h2>Multi-source live sentiment (free real-time)</h2>
+<div class="grid-3">
+  <div class="card">
+    <div class="kv"><span class="k">Composite z-score</span>
+      <span class="v {% if sentiment.composite_score >= 0 %}pos{% else %}neg{% endif %}">{{ '{:+.3f}'.format(sentiment.composite_score) }}</span></div>
+    <div class="kv"><span class="k">Active signals</span>
+      <span class="v">{{ sentiment.composite_n_signals }} of 3</span></div>
+    <div class="kv"><span class="k">Sources</span>
+      <span class="v">{{ sentiment.sources_available | join(', ') if sentiment.sources_available else '-' }}</span></div>
+  </div>
+  <div class="card">
+    <div class="kv"><span class="k">StockTwits bull</span>
+      <span class="v pos">{{ sentiment.stocktwits_bull_count }}</span></div>
+    <div class="kv"><span class="k">StockTwits bear</span>
+      <span class="v neg">{{ sentiment.stocktwits_bear_count }}</span></div>
+    <div class="kv"><span class="k">StockTwits net</span>
+      <span class="v {% if sentiment.stocktwits_net_sentiment >= 0 %}pos{% else %}neg{% endif %}">{{ '{:+.2f}'.format(sentiment.stocktwits_net_sentiment) }}</span></div>
+    <div class="kv"><span class="k">Message volume</span>
+      <span class="v">{{ sentiment.stocktwits_message_volume }}</span></div>
+  </div>
+  <div class="card">
+    <div class="kv"><span class="k">ApeWisdom mentions</span>
+      <span class="v">{{ sentiment.apewisdom_mentions }}</span></div>
+    <div class="kv"><span class="k">24h change</span>
+      <span class="v {% if sentiment.apewisdom_mentions_24h_change >= 0 %}pos{% else %}neg{% endif %}">{{ '{:+d}'.format(sentiment.apewisdom_mentions_24h_change) }}</span></div>
+    <div class="kv"><span class="k">Reddit rank</span>
+      <span class="v">{{ sentiment.apewisdom_rank if sentiment.apewisdom_rank else '-' }}</span></div>
+    <div class="kv"><span class="k">25-delta IV skew</span>
+      <span class="v">{{ '{:+.4f}'.format(sentiment.iv_skew_25d) if sentiment.iv_skew_25d is not none else '-' }}</span></div>
+    <div class="kv"><span class="k">IV-skew read</span>
+      <span class="v"><span class="tag {% if sentiment.iv_skew_interpretation == 'bullish' %}tag-green{% elif sentiment.iv_skew_interpretation == 'bearish' %}tag-red{% else %}tag-blue{% endif %}">{{ sentiment.iv_skew_interpretation }}</span></span></div>
+  </div>
+</div>
+{% endif %}
+
+{% if critique %}
+<h2>Analyst critique</h2>
+<div class="grid-2">
+  <div class="card">
+    <div class="kv"><span class="k">Agreement with model</span>
+      <span class="v"><span class="tag {% if critique.agreement == 'agree' %}tag-green{% elif critique.agreement == 'disagree' %}tag-red{% else %}tag-orange{% endif %}">{{ critique.agreement }}</span></span></div>
+    <div class="kv"><span class="k">Confidence</span>
+      <span class="v">{{ critique.confidence }}</span></div>
+    <div class="kv"><span class="k">PM one-liner</span>
+      <span class="v">{{ critique.one_line_pm_summary }}</span></div>
+    <div class="kv"><span class="k">Sensitivity concern</span>
+      <span class="v">{{ critique.sensitivity_concern }}</span></div>
+  </div>
+  <div class="card">
+    <h3 style="color: var(--orange); margin: 0 0 6px 0;">What the model may have missed</h3>
+    <ul class="risk-list">
+      {% for m in critique.what_the_model_missed %}<li>{{ m }}</li>{% endfor %}
+    </ul>
+    {% if critique.flags %}
+    <h3 style="color: var(--accent2); margin: 12px 0 6px 0;">Critique flags</h3>
+    <ul class="risk-list" style="color: var(--accent2);">
+      {% for f in critique.flags %}<li>{{ f }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+<h2 style="color: var(--accent2);">Factor contribution methodology &mdash; where the numbers come from</h2>
+<div class="card full">
+  <div style="color: var(--fg2); font-size: 13px; line-height: 1.55;">
+    <p><b>Point return formula (linear factor model)</b>:
+    <code style="background:var(--bg3);padding:2px 6px;border-radius:3px;">r_hat = alpha + sum_i (w_i &times; f_i)</code>
+    where <code>w_i</code> is the cross-sectional loading for factor <i>i</i>
+    (estimated from the cross-section of US large-cap names) and <code>f_i</code> is the
+    z-scored factor value for this ticker (Grinold-Kahn winsorization at &plusmn;3).
+    </p>
+    <p><b>Per-factor contribution</b> shown in the waterfall above is exactly
+    <code>w_i &times; f_i</code> (decimal-return units), so the bars sum (with intercept) to
+    the linear forecast point. The <i>ensemble</i> point combines linear / Monte Carlo /
+    AR(1) / random-walk per per-method-comparison table.</p>
+    <p><b>Bias mapping (composite z-score &rarr; LONG/NEUTRAL/SHORT)</b>:
+    weighted sum of value (1.0), quality (0.7), momentum (1.0), low-vol (0.5), revisions (1.0),
+    news-activity (0.6); thresholds &plusmn;1.0 with macro override (risk-off +
+    LONG &rarr; reduce to NEUTRAL; risk-on-growth + SHORT &rarr; reduce to NEUTRAL).
+    LONG &rarr; long-bias screen (long-call / call-debit-spread / covered-call); SHORT &rarr;
+    short-bias screen (long-put / put-debit-spread / bear-call-spread); NEUTRAL &rarr; cash.</p>
+    <p><b>Sensitivity</b> (one-factor-at-a-time tornado above): impact = <code>w_i &times; 1sd</code>
+    per factor (MSCI / Two-Sigma Venn convention). Stress scenarios are canned multi-factor
+    shocks (rates +100bps; recession risk-off; quality flight).</p>
+    <p><b>Factor decay</b> uses exponential half-life per factor type:
+    catalysts 7d, news 14d, revisions 30d, momentum 45d, value 90d, quality 90d
+    (Tetlock 2007; Cohen-Malloy-Pomorski 2012). The heatmap above shows
+    <code>contribution &times; exp(-ln(2) &times; t / half_life)</code> on a 5-day grid.</p>
+    <p><b>Factor IC backtest</b>: Spearman rank correlation between each factor's
+    cross-sectional ranking on day <i>t</i> and the realized <i>h</i>-day-forward
+    return, aggregated across the panel (Grinold-Kahn 2000 ch.4 fundamental law of
+    active management). Source for this report: <code>{{ ic_backtest_provenance }}</code>.</p>
+  </div>
+</div>
+
+<h2>Catalysts in window ({{ horizon_days }}d)</h2>
+<div class="card full">
+{% if catalysts %}
+  <table>
+    <thead><tr><th>Date</th><th>Type</th><th>Source</th><th>Confidence</th><th>Description</th></tr></thead>
+    <tbody>
+    {% for cat in catalysts %}
+      <tr>
+        <td>{{ cat.catalyst_date }}</td>
+        <td><span class="tag tag-orange">{{ cat.catalyst_type }}</span></td>
+        <td>{{ cat.source }}</td>
+        <td>{{ cat.confidence }}</td>
+        <td>{{ cat.catalyst_description or '' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <em style="color: var(--muted);">No catalysts within the forecast window.</em>
+{% endif %}
+</div>
+
+<h2>Analyst narrative</h2>
+<div class="grid-2">
+  <div class="narrative-card bull">
+    <h3>Bull case</h3>
+    <div>{{ narrative.bull_case }}</div>
+  </div>
+  <div class="narrative-card bear">
+    <h3>Bear case</h3>
+    <div>{{ narrative.bear_case }}</div>
+  </div>
+</div>
+<div class="narrative-card syn" style="margin-top: 12px;">
+  <h3>Synthesis</h3>
+  <div>{{ narrative.synthesis }}</div>
+</div>
+{% if narrative.risk_flags %}
+<div class="card full" style="margin-top: 12px;">
+  <h3 style="color: var(--orange); margin-top: 0;">Risk flags</h3>
+  <ul class="risk-list">
+  {% for f in narrative.risk_flags %}<li>{{ f }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<div class="footer">
+  Generated by Trade Identifier Forecast Layer v{{ report_v2_version }} (dark mode).
+  Ensemble methodology: linear multi-factor regression + GBM Monte Carlo + AR(1) + random-walk baseline.
+  Factor decay: exponential half-life per factor type (Tetlock 2007; Cohen-Malloy-Pomorski 2012).
+  Macro context: 10y / 3m Treasury yields + VIX z-score + sector ETF relative strength.
+  Narrative source: {{ narrative.source }}{% if narrative.source == 'claude' %} (Anthropic Claude){% else %} (deterministic template fallback){% endif %}.
+  Not investment advice.
+</div>
+
+</body>
+</html>
