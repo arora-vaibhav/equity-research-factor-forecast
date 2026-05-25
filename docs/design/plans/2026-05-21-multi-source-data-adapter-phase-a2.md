@@ -10,7 +10,7 @@
 
 **Spec references:**
 - The layer architecture — §6 (storage shape), §13 (data integrity invariants) are the primary sources
-- [docs/claude-code/specs/2026-05-21-multi-source-data-adapter-design.md](../specs/2026-05-21-multi-source-data-adapter-design.md) — Phase A.1 sub-spec; A.2 builds on its `field_provenance` and `source_run_log` table designs
+- [docs/design/specs/2026-05-21-multi-source-data-adapter-design.md](../specs/2026-05-21-multi-source-data-adapter-design.md) — Phase A.1 sub-spec; A.2 builds on its `field_provenance` and `source_run_log` table designs
 
 **Out of scope for A.2** (covered in later phases):
 - Refactoring `screen.py` / `factors.py` to consume `canonical_universe` → A.3
@@ -1528,7 +1528,7 @@ In the build plan, find the `### 5.1.0 Sub-phase ordering` section. It contains 
 
 Use the `Edit` tool to update the A.2 row. Change:
 - **Before (the old A.2 row):** `| **A.2** | (to be written after A.1 lands) | SQLite migration: ...`
-- **After:** `| **A.2** | [docs/claude-code/plans/2026-05-21-multi-source-data-adapter-phase-a2.md](docs/claude-code/plans/2026-05-21-multi-source-data-adapter-phase-a2.md) | SQLite migration shipped: 9 new tables (canonical_universe, thesis_objects, field_provenance, source_run_log, historical_price, historical_iv, historical_earnings_reactions, posterior_cache, agent_response_cache) + raw_finviz view. Schema v2. Pydantic models for all. Insert helpers for canonical/provenance/runlog/price. | Migration idempotent; existing finviz_universe_history preserved as raw_finviz view |`
+- **After:** `| **A.2** | [docs/design/plans/2026-05-21-multi-source-data-adapter-phase-a2.md](docs/design/plans/2026-05-21-multi-source-data-adapter-phase-a2.md) | SQLite migration shipped: 9 new tables (canonical_universe, thesis_objects, field_provenance, source_run_log, historical_price, historical_iv, historical_earnings_reactions, posterior_cache, agent_response_cache) + raw_finviz view. Schema v2. Pydantic models for all. Insert helpers for canonical/provenance/runlog/price. | Migration idempotent; existing finviz_universe_history preserved as raw_finviz view |`
 
 The other rows (A.3, A.4, A.5) remain unchanged.
 
@@ -1589,7 +1589,7 @@ A.2 is complete when **all** of these are true:
 
 ## Execution Handoff
 
-Plan complete and saved to `docs/claude-code/plans/2026-05-21-multi-source-data-adapter-phase-a2.md`. Two execution options:
+Plan complete and saved to `docs/design/plans/2026-05-21-multi-source-data-adapter-phase-a2.md`. Two execution options:
 
 **1. Subagent-Driven (recommended)** — Each task dispatched to a fresh subagent, with review between tasks.
 

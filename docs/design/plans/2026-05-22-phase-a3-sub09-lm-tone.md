@@ -48,7 +48,7 @@ A.3.9 ships:
 
 **Tech Stack:** Python 3.11+, `requests`, `pydantic` v2, `pytest`, `pytest-mock`, `beautifulsoup4` (re-use), `tenacity` (re-use). No other new deps.
 
-**Spec reference:** [docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §7.1 row 6, §7.2 signal 6, §12.3 (LM dictionary asset path), §14 error matrix row "LM dictionary missing", §15 row A.3.9, §18 entry 12.
+**Spec reference:** [docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §7.1 row 6, §7.2 signal 6, §12.3 (LM dictionary asset path), §14 error matrix row "LM dictionary missing", §15 row A.3.9, §18 entry 12.
 
 **Methodology references:**
 

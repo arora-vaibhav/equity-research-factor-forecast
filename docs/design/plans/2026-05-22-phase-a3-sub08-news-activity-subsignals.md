@@ -32,7 +32,7 @@ Source classes follow the A.1 scaffold-then-extend pattern. Each `*Source` expos
 
 **Tech Stack:** Python 3.11+, `requests`, `pydantic` v2, `pytest`, `pytest-mock`, **`pytrends>=4.9.2`** (NEW runtime dep — added to `requirements.txt`). The `pytrends` package wraps Google Trends and is the standard FEARS-construction tool in the literature replication code (Da-Engelberg-Gao 2015 used a private Google data-feed; pytrends is the post-2014 public replica). No other new deps. GDELT 15-min files are plain CSV-gz over HTTPS — `requests` + stdlib `gzip` + `csv` are sufficient.
 
-**Spec reference:** [docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §7.1 rows 2–5 + 7, §7.2 per-signal formulas, §15 row A.3.8, §18 entries 7–11.
+**Spec reference:** [docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §7.1 rows 2–5 + 7, §7.2 per-signal formulas, §15 row A.3.8, §18 entries 7–11.
 
 **Methodology references** (one-line mechanism each):
 
@@ -221,7 +221,7 @@ At the end of `schemas.py`, append:
 class RawGdeltMention(BaseModel):
     """One GDELT GKG 15-minute record mapped to a ticker.
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
     section 7.1 row 4. Stored in raw_gdelt. PK:
     (gkg_record_id, ticker).
 

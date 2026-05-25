@@ -14,7 +14,7 @@ CSV parsing for FRED and pipe-delimited parsing for FINRA both live inside their
 
 **Tech Stack:** Python 3.11+, `requests`, `tenacity`, `pydantic` v2, `pytest`, `pytest-mock`. No new runtime dependencies. (FRED CSV is plain `text/csv` with no compression; FINRA files are plain text from the `cdn.finra.org` CDN — no gzip handling needed for the public daily/biweekly files we target.)
 
-**Spec reference:** [docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §6.4 (FRED) + §6.5 (FINRA) + §3 Principle 5 (no silent overwrite) + Principle 6 (watermarks bound deltas).
+**Spec reference:** [docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §6.4 (FRED) + §6.5 (FINRA) + §3 Principle 5 (no silent overwrite) + Principle 6 (watermarks bound deltas).
 
 **Methodology reference:** the methodology bibliography — Diether, Lee, Werner (2009), *"Short-Sale Strategies and Return Predictability"*, Review of Financial Studies, consumes the FINRA substrate produced here. The macro substrate (`DGS10`, `DGS3MO`, `DGS2`, `VIXCLS`, `CPIAUCSL`) feeds the regime priors used in the higher-layer signals; the actual signal construction is the consumer's job, not A.3.5's.
 
@@ -303,7 +303,7 @@ At the **end** of `src/common/schemas.py`, append:
 class RawFredObservation(BaseModel):
     """One row per (series_id, observation_date) FRED macro observation.
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
     section 6.4. Stored in raw_fred. PK: (series_id, observation_date).
 
     `realtime_start` / `realtime_end` model the FRED ALFRED vintage-data
@@ -347,7 +347,7 @@ class RawFredObservation(BaseModel):
 class RawFinraShortInterest(BaseModel):
     """One row per (ticker, settlement_date, exchange) FINRA short-volume record.
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
     section 6.5. Stored in raw_finra. PK: (ticker, settlement_date, exchange).
 
     The `exchange` discriminator (NSDQ / NYSE / NYAX / ORF) lets us
@@ -2286,13 +2286,13 @@ Grep the build plan for `**A.3.1 + A.3.2 + A.3.3 + A.3.4 shipped 2026-05-21**` t
 Use `Edit` to replace the substring `**A.3.1 + A.3.2 + A.3.3 + A.3.4 shipped 2026-05-21**` with `**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 shipped 2026-05-21**`, and update the plan-link parenthetical to add the A.3.5 plan file. Concretely, find this fragment:
 
 ```
-**A.3.1 + A.3.2 + A.3.3 + A.3.4 shipped 2026-05-21** (plans: [A.3.1](docs/claude-code/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/claude-code/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/claude-code/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md), [A.3.4](docs/claude-code/plans/2026-05-21-phase-a3-sub04-edgar-insider-and-filings.md)): schema v6
+**A.3.1 + A.3.2 + A.3.3 + A.3.4 shipped 2026-05-21** (plans: [A.3.1](docs/design/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/design/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/design/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md), [A.3.4](docs/design/plans/2026-05-21-phase-a3-sub04-edgar-insider-and-filings.md)): schema v6
 ```
 
 Replace with:
 
 ```
-**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 shipped 2026-05-21** (plans: [A.3.1](docs/claude-code/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/claude-code/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/claude-code/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md), [A.3.4](docs/claude-code/plans/2026-05-21-phase-a3-sub04-edgar-insider-and-filings.md), [A.3.5](docs/claude-code/plans/2026-05-21-phase-a3-sub05-fred-finra.md)): schema v7
+**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 shipped 2026-05-21** (plans: [A.3.1](docs/design/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/design/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/design/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md), [A.3.4](docs/design/plans/2026-05-21-phase-a3-sub04-edgar-insider-and-filings.md), [A.3.5](docs/design/plans/2026-05-21-phase-a3-sub05-fred-finra.md)): schema v7
 ```
 
 Then in the same sentence, append the A.3.5 fragment after the existing A.3.4 fragment (right before the `. A.3.5–A.3.10 plans drafted...` clause if present, otherwise at the end of the current shipped-summary clause):

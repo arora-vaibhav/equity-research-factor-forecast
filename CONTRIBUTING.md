@@ -25,8 +25,8 @@ What I am unlikely to merge:
 ## Local development
 
 ```powershell
-git clone https://github.com/arora-vaibhav/equity-research-factor-forecast-claude.git
-cd equity-research-factor-forecast-claude
+git clone https://github.com/arora-vaibhav/equity-research-factor-forecast.git
+cd equity-research-factor-forecast
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 pip install -r requirements.txt

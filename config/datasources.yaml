@@ -1,5 +1,5 @@
 # Multi-source data adapter configuration.
-# Spec: docs/claude-code/specs/2026-05-21-multi-source-data-adapter-design.md §9.
+# Spec: docs/design/specs/2026-05-21-multi-source-data-adapter-design.md §9.
 # 2026-05-21: broadened Finviz universe to a $1B+ intent.
 
 # --- Finviz universe filter --------------------------------------------

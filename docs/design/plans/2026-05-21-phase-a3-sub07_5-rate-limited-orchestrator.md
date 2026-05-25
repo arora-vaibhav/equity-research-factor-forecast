@@ -33,7 +33,7 @@ The orchestrator does NOT live in `src/common/datasources/` because it is struct
 
 **Tech Stack:** Python 3.11+, `pyyaml` (already pinned for `config/datasources.yaml`), `pydantic` v2, `pytest`, `pytest-mock`. **No new runtime dependencies.** The orchestrator deliberately does NOT pull in any of the heavier task-queue libraries (Celery, RQ, Dramatiq, Huey, APScheduler) — they would each be ~10–50 MB of transitive deps for a feature surface that requires a SQLite table + a function. The trade-off is documented under Out of Scope below.
 
-**Spec reference:** [docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §15 row "A.3.7.5" + 2026-05-21 directive.
+**Spec reference:** [docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §15 row "A.3.7.5" + 2026-05-21 directive.
 
 **Provider quota configuration:** All quota numbers live in `config/orchestrator.yaml` (created in Task 2), NOT hardcoded:
 
@@ -436,7 +436,7 @@ _QueueStatus = Literal["pending", "dispatched", "completed", "failed", "deferred
 class ProviderCallLog(BaseModel):
     """One row per provider HTTP call. Append-only audit trail.
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
     section 15 row A.3.7.5. Distinct from `source_run_log` (which is per-run
     aggregate); this is per-call granularity for replay + debugging.
 
@@ -1514,7 +1514,7 @@ Exposes:
   - QuotaWindow: pure-function sliding-window math
   - prioritize_queue, score_entry: pure-function priority scoring
 
-Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
 section 15 row A.3.7.5.
 """
 from src.common.orchestrator.fetch_orchestrator import RateLimitedFetchOrchestrator
@@ -2914,13 +2914,13 @@ Use `Edit` to replace the substring `**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 + A
 Concretely, locate this fragment:
 
 ```
-**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 + A.3.6 + A.3.7 shipped 2026-05-21** (plans: [A.3.1](docs/claude-code/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/claude-code/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/claude-code/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md), [A.3.4](docs/claude-code/plans/2026-05-21-phase-a3-sub04-edgar-insider-and-filings.md), [A.3.5](docs/claude-code/plans/2026-05-21-phase-a3-sub05-fred-finra.md), [A.3.6](docs/claude-code/plans/2026-05-21-phase-a3-sub06-stockanalysis-ratios.md), [A.3.7](docs/claude-code/plans/2026-05-21-phase-a3-sub07-openbb-router.md)): schema v9
+**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 + A.3.6 + A.3.7 shipped 2026-05-21** (plans: [A.3.1](docs/design/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/design/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/design/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md), [A.3.4](docs/design/plans/2026-05-21-phase-a3-sub04-edgar-insider-and-filings.md), [A.3.5](docs/design/plans/2026-05-21-phase-a3-sub05-fred-finra.md), [A.3.6](docs/design/plans/2026-05-21-phase-a3-sub06-stockanalysis-ratios.md), [A.3.7](docs/design/plans/2026-05-21-phase-a3-sub07-openbb-router.md)): schema v9
 ```
 
 Replace with:
 
 ```
-**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 + A.3.6 + A.3.7 + A.3.7.5 shipped 2026-05-21** (plans: [A.3.1](docs/claude-code/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/claude-code/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/claude-code/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md), [A.3.4](docs/claude-code/plans/2026-05-21-phase-a3-sub04-edgar-insider-and-filings.md), [A.3.5](docs/claude-code/plans/2026-05-21-phase-a3-sub05-fred-finra.md), [A.3.6](docs/claude-code/plans/2026-05-21-phase-a3-sub06-stockanalysis-ratios.md), [A.3.7](docs/claude-code/plans/2026-05-21-phase-a3-sub07-openbb-router.md), [A.3.7.5](docs/claude-code/plans/2026-05-21-phase-a3-sub07_5-rate-limited-orchestrator.md)): schema v10
+**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 + A.3.6 + A.3.7 + A.3.7.5 shipped 2026-05-21** (plans: [A.3.1](docs/design/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/design/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/design/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md), [A.3.4](docs/design/plans/2026-05-21-phase-a3-sub04-edgar-insider-and-filings.md), [A.3.5](docs/design/plans/2026-05-21-phase-a3-sub05-fred-finra.md), [A.3.6](docs/design/plans/2026-05-21-phase-a3-sub06-stockanalysis-ratios.md), [A.3.7](docs/design/plans/2026-05-21-phase-a3-sub07-openbb-router.md), [A.3.7.5](docs/design/plans/2026-05-21-phase-a3-sub07_5-rate-limited-orchestrator.md)): schema v10
 ```
 
 In the same A.3 row description, append the A.3.7.5 fragment after the existing A.3.7 fragment:

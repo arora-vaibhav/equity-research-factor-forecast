@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python 3.11+, `requests`, `tenacity` (already a dep — used in A.1 plans), `pydantic` v2, `pytest`, `pytest-mock`. No new runtime dependencies.
 
-**Spec reference:** [docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §6.3.1 (10-K/10-Q XBRL fundamentals) + §3 Principle 6 (watermarks bound deltas) + §3 Principle 5 (no overwrite without `force_refetch`).
+**Spec reference:** [docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §6.3.1 (10-K/10-Q XBRL fundamentals) + §3 Principle 6 (watermarks bound deltas) + §3 Principle 5 (no overwrite without `force_refetch`).
 
 **Out of scope for A.3.3:**
 - EDGAR Form 4 insider transactions → A.3.4
@@ -240,7 +240,7 @@ class RawEdgarFundamentalsRow(BaseModel):
     """One per-period structured fundamentals row parsed from the SEC
     companyfacts XBRL JSON.
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
     section 6.3.1. Stored in raw_edgar_fundamentals.
 
     Primary key conceptually: (run_id, ticker, fiscal_period, fiscal_year).
@@ -2528,13 +2528,13 @@ Grep the build plan for `**A.3.1 + A.3.2 shipped 2026-05-21**` to find the line.
 Use `Edit` to replace the substring `**A.3.1 + A.3.2 shipped 2026-05-21**` with `**A.3.1 + A.3.2 + A.3.3 shipped 2026-05-21**`, and update the plan-link parenthetical to add the A.3.3 plan file. Concretely, find this fragment:
 
 ```
-**A.3.1 + A.3.2 shipped 2026-05-21** (plans: [A.3.1](docs/claude-code/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/claude-code/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md)): schema v4
+**A.3.1 + A.3.2 shipped 2026-05-21** (plans: [A.3.1](docs/design/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/design/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md)): schema v4
 ```
 
 Replace with:
 
 ```
-**A.3.1 + A.3.2 + A.3.3 shipped 2026-05-21** (plans: [A.3.1](docs/claude-code/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/claude-code/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/claude-code/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md)): schema v5
+**A.3.1 + A.3.2 + A.3.3 shipped 2026-05-21** (plans: [A.3.1](docs/design/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/design/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/design/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md)): schema v5
 ```
 
 Then in the same sentence, append after the existing `+ raw_yahoo source-native table`:

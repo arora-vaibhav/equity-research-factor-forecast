@@ -14,7 +14,7 @@ HTML parsing lives in a **pure-function module** (`src/common/datasources/stocka
 
 **Tech Stack:** Python 3.11+, `requests`, `tenacity`, `pydantic` v2, `pytest`, `pytest-mock`, **+ new dependency `beautifulsoup4`** for HTML parsing. BeautifulSoup is the standard tool for "scrape a vendor's HTML table" in Python; it gives us a robust DOM with CSS-selector / `find_all('table')` semantics. No new runtime dependencies beyond `beautifulsoup4`. (No `lxml` — `beautifulsoup4` ships with the stdlib `html.parser` backend and that is sufficient for stockanalysis.com's small ratio-page payloads.)
 
-**Spec reference:** [docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §6.6 (StockanalysisSource) + §3 Principle 5 (no silent overwrite) + Principle 6 (watermarks bound deltas).
+**Spec reference:** [docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §6.6 (StockanalysisSource) + §3 Principle 5 (no silent overwrite) + Principle 6 (watermarks bound deltas).
 
 **Methodology reference:** the methodology bibliography — the 10-year ratio history powers `pe_5y_percentile` and `ev_ebitda_5y_percentile` in `canonical_universe`. These trailing-window percentile features feed A.3.10 valuation factor scoring: a stock trading at the 10th percentile of its own 5-year P/E distribution scores high on "cheap-vs-history"; one at the 90th percentile scores low. Sector-relative valuation is the other axis (A.3.8+); the self-history axis lives here.
 
@@ -381,7 +381,7 @@ class RawStockanalysisRatioRow(BaseModel):
     """One (ticker, metric, period_end_date) ratio observation scraped
     from stockanalysis.com.
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
     section 6.6. Stored long-format in raw_stockanalysis_ratios; PK
     (ticker, metric, period_end_date). The materialization layer (A.3.10)
     pivots this table to wide form when computing the 5-year percentile
@@ -2510,13 +2510,13 @@ Grep the build plan for `**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 shipped 2026-05
 Use `Edit` to replace the substring `**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 shipped 2026-05-21**` with `**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 + A.3.6 shipped 2026-05-21**`, and update the plan-link parenthetical to add the A.3.6 plan file plus bump the schema marker from v7 to v8. Concretely, find this fragment:
 
 ```
-**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 shipped 2026-05-21** (plans: [A.3.1](docs/claude-code/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/claude-code/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/claude-code/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md), [A.3.4](docs/claude-code/plans/2026-05-21-phase-a3-sub04-edgar-insider-and-filings.md), [A.3.5](docs/claude-code/plans/2026-05-21-phase-a3-sub05-fred-finra.md)): schema v7
+**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 shipped 2026-05-21** (plans: [A.3.1](docs/design/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/design/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/design/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md), [A.3.4](docs/design/plans/2026-05-21-phase-a3-sub04-edgar-insider-and-filings.md), [A.3.5](docs/design/plans/2026-05-21-phase-a3-sub05-fred-finra.md)): schema v7
 ```
 
 Replace with:
 
 ```
-**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 + A.3.6 shipped 2026-05-21** (plans: [A.3.1](docs/claude-code/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/claude-code/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/claude-code/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md), [A.3.4](docs/claude-code/plans/2026-05-21-phase-a3-sub04-edgar-insider-and-filings.md), [A.3.5](docs/claude-code/plans/2026-05-21-phase-a3-sub05-fred-finra.md), [A.3.6](docs/claude-code/plans/2026-05-21-phase-a3-sub06-stockanalysis-ratios.md)): schema v8
+**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 + A.3.6 shipped 2026-05-21** (plans: [A.3.1](docs/design/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/design/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/design/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md), [A.3.4](docs/design/plans/2026-05-21-phase-a3-sub04-edgar-insider-and-filings.md), [A.3.5](docs/design/plans/2026-05-21-phase-a3-sub05-fred-finra.md), [A.3.6](docs/design/plans/2026-05-21-phase-a3-sub06-stockanalysis-ratios.md)): schema v8
 ```
 
 Then in the same sentence, append the A.3.6 fragment after the existing A.3.5 fragment:

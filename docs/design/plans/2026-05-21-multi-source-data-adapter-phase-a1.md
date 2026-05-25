@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python 3.11+, `abc`, `pydantic`, `pyyaml`, `requests`, `yfinance`, `finvizfinance`, `pytest`. New runtime dependencies added in this plan: `requests` (FRED, EDGAR, FINRA, stockanalysis HTTP), `tenacity` (retry/backoff).
 
-**Spec reference:** [docs/claude-code/specs/2026-05-21-multi-source-data-adapter-design.md](../specs/2026-05-21-multi-source-data-adapter-design.md), specifically §4 (source set), §5 (module layout), §6 (BaseDataSource contract), §7 (registry), §9 (resolution policy), §11 (sub-phase acceptance).
+**Spec reference:** [docs/design/specs/2026-05-21-multi-source-data-adapter-design.md](../specs/2026-05-21-multi-source-data-adapter-design.md), specifically §4 (source set), §5 (module layout), §6 (BaseDataSource contract), §7 (registry), §9 (resolution policy), §11 (sub-phase acceptance).
 
 **Out of scope for A.1** (covered in later phases — listed here so reviewers don't expect them):
 - SQLite schema migration → A.2
@@ -662,7 +662,7 @@ Create `config/datasources.yaml`:
 
 ```yaml
 # Multi-source data adapter configuration.
-# Spec: docs/claude-code/specs/2026-05-21-multi-source-data-adapter-design.md §9.
+# Spec: docs/design/specs/2026-05-21-multi-source-data-adapter-design.md §9.
 
 enabled_sources:
   - finviz
@@ -2192,12 +2192,12 @@ After the existing §5.1 introduction and before its existing bullet list, inser
 ### 5.1.0 Sub-phase ordering
 
 Phase A is decomposed into ordered sub-phases per the multi-source data adapter
-design spec (`docs/claude-code/specs/2026-05-21-multi-source-data-adapter-design.md`).
+design spec (`docs/design/specs/2026-05-21-multi-source-data-adapter-design.md`).
 Each sub-phase is acceptance-tested before the next begins, per §13 handoff protocol.
 
 | Sub-phase | Plan file | Deliverable | Acceptance |
 |---|---|---|---|
-| **A.1** | `docs/claude-code/plans/2026-05-21-multi-source-data-adapter-phase-a1.md` | `src/common/datasources/` framework + six source classes (Finviz/Yahoo/EDGAR/FRED/stockanalysis/FINRA) with `health_check()`; two Layer-2 scaffold stubs; `config/datasources.yaml` | Every active source's `health_check()` passes (`pytest -m integration`); scaffold stubs raise `NotImplementedError` |
+| **A.1** | `docs/design/plans/2026-05-21-multi-source-data-adapter-phase-a1.md` | `src/common/datasources/` framework + six source classes (Finviz/Yahoo/EDGAR/FRED/stockanalysis/FINRA) with `health_check()`; two Layer-2 scaffold stubs; `config/datasources.yaml` | Every active source's `health_check()` passes (`pytest -m integration`); scaffold stubs raise `NotImplementedError` |
 | **A.2** | (to be written after A.1 lands) | SQLite migration: `raw_<source>`, `canonical_universe`, `field_provenance`, `source_run_log` tables; Pydantic models in `schemas.py` | Migration idempotent; existing `finviz_universe_history` preserved as `raw_finviz` view |
 | **A.3** | (to be written after A.2 lands) | Refactor `screen.py` + `factors.py` to consume `canonical_universe`; implement remaining `fetch_*` methods on each source | `run_layer1()` public signature unchanged; fixture-data outputs equivalent |
 | **A.4** | (to be written after A.3 lands) | Notebook extension: Source Status, Provenance Summary, Per-Ticker Drilldown; `ENABLED_SOURCES` + `FORCE_REFRESH_SOURCES` controls | Notebook runs end-to-end against fixture data |
@@ -2260,7 +2260,7 @@ A.1 is complete when **all** of these are true:
 
 ## Execution Handoff
 
-Plan complete and saved to `docs/claude-code/plans/2026-05-21-multi-source-data-adapter-phase-a1.md`. Two execution options:
+Plan complete and saved to `docs/design/plans/2026-05-21-multi-source-data-adapter-phase-a1.md`. Two execution options:
 
 **1. Subagent-Driven (recommended)** — Each task dispatched to a fresh subagent, with review between tasks. Best for pacing consumption and catching design slips early.
 

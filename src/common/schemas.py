@@ -189,7 +189,7 @@ class FilterConfig(BaseModel):
 class CanonicalUniverseRow(BaseModel):
     """Per-(run_id, ticker) wide row in canonical_universe.
 
-    Spec: docs/claude-code/specs/2026-05-21-platform-architecture-v2.md section 6.1.
+    Spec: docs/design/specs/2026-05-21-platform-architecture-v2.md section 6.1.
     All non-id fields are Optional because data coverage is imperfect.
     """
 
@@ -384,7 +384,7 @@ class AgentResponseCacheEntry(BaseModel):
 class FetchWatermark(BaseModel):
     """Per (source, ticker, field) tracking of what we've already fetched.
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md section 5.1.
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md section 5.1.
     PRIMARY KEY of the underlying table is (source, ticker, field).
     `ticker='*'` is the convention for non-ticker-scoped data such as
     FRED macro series.
@@ -406,7 +406,7 @@ class FetchWatermark(BaseModel):
 class RawYahooRow(BaseModel):
     """One Yahoo Finance fundamentals snapshot per (run_id, ticker).
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
     section 6.2. Stored in raw_yahoo table. Source-native (no canonicalization).
     """
 
@@ -454,7 +454,7 @@ class RawEdgarFundamentalsRow(BaseModel):
     """One per-period structured fundamentals row parsed from the SEC
     companyfacts XBRL JSON.
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
     section 6.3.1. Stored in raw_edgar_fundamentals.
 
     Primary key conceptually: (run_id, ticker, fiscal_period, fiscal_year).
@@ -553,7 +553,7 @@ _FORM4_TRANSACTION_CODES = Literal[
 class RawFredObservation(BaseModel):
     """One row per (series_id, observation_date) FRED macro observation.
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
     section 6.4. Stored in raw_fred. PK: (series_id, observation_date).
 
     `realtime_start` / `realtime_end` model the FRED ALFRED vintage-data
@@ -597,7 +597,7 @@ class RawFredObservation(BaseModel):
 class RawFinraShortInterest(BaseModel):
     """One row per (ticker, settlement_date, exchange) FINRA short-volume record.
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
     section 6.5. Stored in raw_finra. PK: (ticker, settlement_date, exchange).
 
     The `exchange` discriminator (NSDQ / NYSE / NYAX / ORF) lets us
@@ -647,7 +647,7 @@ _EDGAR_FORM_TYPES = Literal[
 class RawEdgarInsiderRow(BaseModel):
     """One row per Form 4 non-derivative line item.
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
     section 6.3.2. Stored in raw_edgar_insider.
 
     Primary key conceptually:
@@ -797,7 +797,7 @@ class RawStockanalysisRatioRow(BaseModel):
     """One (ticker, metric, period_end_date) ratio observation scraped
     from stockanalysis.com.
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
     section 6.6. Stored long-format in raw_stockanalysis_ratios; PK
     (ticker, metric, period_end_date). The materialization layer (A.3.10)
     pivots this table to wide form when computing the 5-year percentile
@@ -887,7 +887,7 @@ class RawOpenBBRow(BaseModel):
     """One (ticker, field_name, provider_used) observation pulled from the
     OpenBB multi-provider router (A.3.7).
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
     section 6.7. Stored long-format in raw_openbb; PK
     (run_id, ticker, field_name, provider_used).
 
@@ -941,7 +941,7 @@ class RawOpenBBRow(BaseModel):
 #   - ProviderQuotaState  -> provider_quota_state  (sliding-window quota)
 #   - FetchQueueEntry     -> fetch_queue           (pending-work queue)
 #
-# Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+# Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
 # section 15 row A.3.7.5.
 
 _CallStatus = Literal["ok", "failed", "deferred"]
@@ -1049,7 +1049,7 @@ class FetchQueueEntry(BaseModel):
 class RawGdeltMention(BaseModel):
     """One GDELT GKG 15-minute record mapped to a ticker.
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
     section 7.1 row 4. Stored in raw_gdelt. PK: (gkg_record_id, ticker).
 
     `gkg_record_id` is GDELT's stable record identifier (the first
@@ -1163,7 +1163,7 @@ class RawPytrendsObservation(BaseModel):
 class RawEdgarFilingToneRow(BaseModel):
     """One Loughran-McDonald tone score per 10-K / 10-Q filing.
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
     section 7.1 row 6, section 7.2 signal 6. Stored in
     raw_edgar_filing_tone. PK: (cik, source_filing_accn,
     lm_dictionary_version) -- so re-scoring under a future LM

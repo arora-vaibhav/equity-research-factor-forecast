@@ -19,7 +19,7 @@ The parsers live in **pure-function** modules so they can be unit-tested against
 
 **Tech Stack:** Python 3.11+, `requests`, `tenacity`, `pydantic` v2, stdlib `xml.etree.ElementTree`, `pytest`, `pytest-mock`. No new runtime dependencies.
 
-**Spec reference:** [docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §6.3.2 (Form 4) + §6.3.3 (8-K) + §3 Principle 5/6 (no overwrite + watermarks bound deltas) + §7.1 row 1 (CMP as `news_activity_score` lead).
+**Spec reference:** [docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §6.3.2 (Form 4) + §6.3.3 (8-K) + §3 Principle 5/6 (no overwrite + watermarks bound deltas) + §7.1 row 1 (CMP as `news_activity_score` lead).
 
 **Methodology reference:** the methodology bibliography §1 row 1 — Cohen, Malloy, Pomorski (2012), *"Decoding Inside Information"*, Journal of Finance. Routine-trader rule: "an insider who placed a trade in the same calendar month for at least 3 consecutive years prior to the trade in question." We implement the more permissive **≥2 transactions in the same calendar month in the prior 3 years** variant, which is the operational version used in subsequent literature (Jagolinzer et al. 2020 follow the same threshold) and which the spec calls out explicitly in §6.3.2. The classifier writes `opportunistic_classifier_version = "1.0"` on every row for future-recalibration audit.
 
@@ -409,7 +409,7 @@ _EDGAR_FORM_TYPES = Literal[
 class RawEdgarInsiderRow(BaseModel):
     """One row per Form 4 non-derivative line item.
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
     section 6.3.2. Stored in raw_edgar_insider.
 
     Primary key conceptually:
@@ -3285,13 +3285,13 @@ Grep the build plan for `**A.3.1 + A.3.2 + A.3.3 shipped 2026-05-21**` to find t
 Use `Edit` to replace the substring `**A.3.1 + A.3.2 + A.3.3 shipped 2026-05-21**` with `**A.3.1 + A.3.2 + A.3.3 + A.3.4 shipped 2026-05-21**`, and update the plan-link parenthetical to add the A.3.4 plan file. Concretely, find this fragment:
 
 ```
-**A.3.1 + A.3.2 + A.3.3 shipped 2026-05-21** (plans: [A.3.1](docs/claude-code/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/claude-code/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/claude-code/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md)): schema v5
+**A.3.1 + A.3.2 + A.3.3 shipped 2026-05-21** (plans: [A.3.1](docs/design/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/design/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/design/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md)): schema v5
 ```
 
 Replace with:
 
 ```
-**A.3.1 + A.3.2 + A.3.3 + A.3.4 shipped 2026-05-21** (plans: [A.3.1](docs/claude-code/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/claude-code/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/claude-code/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md), [A.3.4](docs/claude-code/plans/2026-05-21-phase-a3-sub04-edgar-insider-and-filings.md)): schema v6
+**A.3.1 + A.3.2 + A.3.3 + A.3.4 shipped 2026-05-21** (plans: [A.3.1](docs/design/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/design/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/design/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md), [A.3.4](docs/design/plans/2026-05-21-phase-a3-sub04-edgar-insider-and-filings.md)): schema v6
 ```
 
 Then in the same sentence, append after the existing A.3.3 fragment:

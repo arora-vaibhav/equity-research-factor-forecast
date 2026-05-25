@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python 3.11+, `sqlite3` (stdlib), `pydantic` v2, `pyyaml`, `pytest`. No new runtime dependencies.
 
-**Spec reference:** [docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §5 (Persistent data accumulation) and §6.8 (.env loader).
+**Spec reference:** [docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §5 (Persistent data accumulation) and §6.8 (.env loader).
 
 **Out of scope for A.3.1:**
 - Any source's actual `fetch_*` real implementation → A.3.2 onward
@@ -165,7 +165,7 @@ At the **end** of `src/common/schemas.py`, append:
 class FetchWatermark(BaseModel):
     """Per (source, ticker, field) tracking of what we've already fetched.
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md section 5.1.
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md section 5.1.
     PRIMARY KEY of the underlying table is (source, ticker, field).
     `ticker='*'` is the convention for non-ticker-scoped data such as
     FRED macro series.
@@ -1376,7 +1376,7 @@ Find the row for A.3 (currently `| **A.3** | (to be written after A.2 lands) | .
 Replace the A.3 row with:
 
 ```markdown
-| **A.3** | [docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md](docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md) | Full Layer 1 hardening — 10 sub-phases (A.3.1 watermarks, A.3.2 Finviz+Yahoo, A.3.3 EDGAR XBRL, A.3.4 EDGAR Form 4 + 8-K + opportunistic-insider, A.3.5 FRED + FINRA, A.3.6 stockanalysis 10y ratios, A.3.7 OpenBB router, A.3.8 5 sub-signals + GDELT + pytrends, A.3.9 LM tone, A.3.10 Yang-Zhang + factors refactor + dual-write + equivalence). **A.3.1 shipped 2026-05-21** ([plan](docs/claude-code/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md)): schema v3 + fetch_watermarks + watermark CRUD + force_refetch + BaseDataSource gap/update helpers + .env loader + api_keys.yaml. | A.3 DoD: all 7 sources real-fetching, news_activity_score 7-signal, Yang-Zhang vol, dual-write equivalence ≤5% drift, full integration suite green |
+| **A.3** | [docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md](docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md) | Full Layer 1 hardening — 10 sub-phases (A.3.1 watermarks, A.3.2 Finviz+Yahoo, A.3.3 EDGAR XBRL, A.3.4 EDGAR Form 4 + 8-K + opportunistic-insider, A.3.5 FRED + FINRA, A.3.6 stockanalysis 10y ratios, A.3.7 OpenBB router, A.3.8 5 sub-signals + GDELT + pytrends, A.3.9 LM tone, A.3.10 Yang-Zhang + factors refactor + dual-write + equivalence). **A.3.1 shipped 2026-05-21** ([plan](docs/design/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md)): schema v3 + fetch_watermarks + watermark CRUD + force_refetch + BaseDataSource gap/update helpers + .env loader + api_keys.yaml. | A.3 DoD: all 7 sources real-fetching, news_activity_score 7-signal, Yang-Zhang vol, dual-write equivalence ≤5% drift, full integration suite green |
 ```
 
 (A.4 and A.5 rows stay unchanged.)

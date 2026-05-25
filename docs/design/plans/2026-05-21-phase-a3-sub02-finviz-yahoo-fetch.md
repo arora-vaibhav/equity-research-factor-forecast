@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python 3.11+, `yfinance==1.3.0`, `finvizfinance==1.3.0`, `tenacity`, `pytest-mock`. No new runtime dependencies.
 
-**Spec reference:** [docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §6.1 (Finviz), §6.2 (Yahoo).
+**Spec reference:** [docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §6.1 (Finviz), §6.2 (Yahoo).
 
 **Out of scope for A.3.2:**
 - EDGAR XBRL parsing → A.3.3
@@ -171,7 +171,7 @@ At the **end** of `src/common/schemas.py`, append:
 class RawYahooRow(BaseModel):
     """One Yahoo Finance fundamentals snapshot per (run_id, ticker).
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
     section 6.2. Stored in raw_yahoo table. Source-native (no canonicalization).
     """
 
@@ -587,7 +587,7 @@ Open `src/common/datasources/finviz_source.py`. **Inside** the `FinvizSource` cl
     def fetch_universe(self, run_id: str) -> "pd.DataFrame":
         """Pull the Finviz mega-cap universe and return a DataFrame.
 
-        Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+        Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
         section 6.1. Source-native columns are preserved (no normalization here —
         that happens at the canonical-resolution layer).
 
@@ -1322,13 +1322,13 @@ Grep the build plan for `**A.3.1 shipped 2026-05-21**` to find the line.
 Use `Edit` to replace the substring `**A.3.1 shipped 2026-05-21**` with `**A.3.1 + A.3.2 shipped 2026-05-21**`, and update the plan-link parenthetical to mention both plan files. Concretely, find this substring in the A.3 row:
 
 ```
-**A.3.1 shipped 2026-05-21** ([plan](docs/claude-code/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md)): schema v3 + `fetch_watermarks` + watermark CRUD + `force_refetch` + BaseDataSource gap/update helpers + `.env` loader + `api_keys.yaml`.
+**A.3.1 shipped 2026-05-21** ([plan](docs/design/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md)): schema v3 + `fetch_watermarks` + watermark CRUD + `force_refetch` + BaseDataSource gap/update helpers + `.env` loader + `api_keys.yaml`.
 ```
 
 Replace with:
 
 ```
-**A.3.1 + A.3.2 shipped 2026-05-21** (plans: [A.3.1](docs/claude-code/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/claude-code/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md)): schema v4 + `fetch_watermarks` + watermark CRUD + `force_refetch` + BaseDataSource gap/update helpers + `.env` loader + `api_keys.yaml` + FinvizSource real `fetch_universe` + YahooSource `fetch_universe` batch + `fetch_fundamentals_for_ticker` + `fetch_historical_price` (watermark-bounded) + `raw_yahoo` source-native table.
+**A.3.1 + A.3.2 shipped 2026-05-21** (plans: [A.3.1](docs/design/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/design/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md)): schema v4 + `fetch_watermarks` + watermark CRUD + `force_refetch` + BaseDataSource gap/update helpers + `.env` loader + `api_keys.yaml` + FinvizSource real `fetch_universe` + YahooSource `fetch_universe` batch + `fetch_fundamentals_for_ticker` + `fetch_historical_price` (watermark-bounded) + `raw_yahoo` source-native table.
 ```
 
 - [ ] **Step 3: Commit**

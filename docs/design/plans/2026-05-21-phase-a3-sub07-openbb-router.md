@@ -14,7 +14,7 @@ The provider-specific HTTP + field-mapping code is colocated in `openbb_source.p
 
 **Tech Stack:** Python 3.11+, `requests`, `tenacity`, `pydantic` v2, `pytest`, `pytest-mock`. **No new runtime dependencies** — `requests` + `tenacity` are already pinned. We deliberately do NOT pull in the `openbb` PyPI package (its install footprint is ~500 MB and pulls in dozens of provider SDKs as transitive deps for a single feature surface; we'd be paying full price for ~5% utilization). The trade-off is documented under Out of Scope below.
 
-**Spec reference:** [docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §6.7 (OpenBBSource) + §6.8 (.env loader) + §3 Principle 5 (no silent overwrite) + Principle 6 (watermarks bound deltas) + §13 Failure modes ("OpenBB key missing → Provider silently skipped; other sources cover").
+**Spec reference:** [docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md](../specs/2026-05-21-phase-a3-layer1-hardening-design.md) §6.7 (OpenBBSource) + §6.8 (.env loader) + §3 Principle 5 (no silent overwrite) + Principle 6 (watermarks bound deltas) + §13 Failure modes ("OpenBB key missing → Provider silently skipped; other sources cover").
 
 **API key configuration:** All three providers' keys live in `.env` and are looked up via `src.common.env_loader.get_api_key("fmp" | "polygon" | "tiingo")`. The `config/api_keys.yaml` mapping is already in place from A.3.1:
 
@@ -427,7 +427,7 @@ class RawOpenBBRow(BaseModel):
     """One (ticker, field_name, provider_used) observation pulled from the
     OpenBB multi-provider router (A.3.7).
 
-    Spec: docs/claude-code/specs/2026-05-21-phase-a3-layer1-hardening-design.md
+    Spec: docs/design/specs/2026-05-21-phase-a3-layer1-hardening-design.md
     section 6.7. Stored long-format in raw_openbb; PK
     (run_id, ticker, field_name, provider_used).
 
@@ -2491,13 +2491,13 @@ Use `Edit` to replace the substring `**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 + A
 Concretely, locate this fragment in the build plan:
 
 ```
-**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 + A.3.6 shipped 2026-05-21** (plans: [A.3.1](docs/claude-code/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/claude-code/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/claude-code/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md), [A.3.4](docs/claude-code/plans/2026-05-21-phase-a3-sub04-edgar-insider-and-filings.md), [A.3.5](docs/claude-code/plans/2026-05-21-phase-a3-sub05-fred-finra.md), [A.3.6](docs/claude-code/plans/2026-05-21-phase-a3-sub06-stockanalysis-ratios.md)): schema v8
+**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 + A.3.6 shipped 2026-05-21** (plans: [A.3.1](docs/design/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/design/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/design/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md), [A.3.4](docs/design/plans/2026-05-21-phase-a3-sub04-edgar-insider-and-filings.md), [A.3.5](docs/design/plans/2026-05-21-phase-a3-sub05-fred-finra.md), [A.3.6](docs/design/plans/2026-05-21-phase-a3-sub06-stockanalysis-ratios.md)): schema v8
 ```
 
 Replace with:
 
 ```
-**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 + A.3.6 + A.3.7 shipped 2026-05-21** (plans: [A.3.1](docs/claude-code/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/claude-code/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/claude-code/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md), [A.3.4](docs/claude-code/plans/2026-05-21-phase-a3-sub04-edgar-insider-and-filings.md), [A.3.5](docs/claude-code/plans/2026-05-21-phase-a3-sub05-fred-finra.md), [A.3.6](docs/claude-code/plans/2026-05-21-phase-a3-sub06-stockanalysis-ratios.md), [A.3.7](docs/claude-code/plans/2026-05-21-phase-a3-sub07-openbb-router.md)): schema v9
+**A.3.1 + A.3.2 + A.3.3 + A.3.4 + A.3.5 + A.3.6 + A.3.7 shipped 2026-05-21** (plans: [A.3.1](docs/design/plans/2026-05-21-phase-a3-sub01-watermarks-foundation.md), [A.3.2](docs/design/plans/2026-05-21-phase-a3-sub02-finviz-yahoo-fetch.md), [A.3.3](docs/design/plans/2026-05-21-phase-a3-sub03-edgar-xbrl-fundamentals.md), [A.3.4](docs/design/plans/2026-05-21-phase-a3-sub04-edgar-insider-and-filings.md), [A.3.5](docs/design/plans/2026-05-21-phase-a3-sub05-fred-finra.md), [A.3.6](docs/design/plans/2026-05-21-phase-a3-sub06-stockanalysis-ratios.md), [A.3.7](docs/design/plans/2026-05-21-phase-a3-sub07-openbb-router.md)): schema v9
 ```
 
 Then in the same sentence (continuing the A.3 row description), append the A.3.7 fragment after the existing A.3.6 fragment:

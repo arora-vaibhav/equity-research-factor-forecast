@@ -2,8 +2,6 @@
 
 This directory contains the design specs and implementation plans I wrote while building this project. They are preserved as engineering receipts. Anyone who wants to understand why a particular module looks the way it does can read the spec that was written before the code.
 
-The directory name is a legacy of how the project was scaffolded; the content is design documentation.
-
 ## Why these documents exist
 
 Every non-trivial component went through the same loop:

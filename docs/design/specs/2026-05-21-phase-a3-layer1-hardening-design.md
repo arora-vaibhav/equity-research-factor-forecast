@@ -6,7 +6,7 @@
 **Scope:** Make Layer 1 production-ready. Wire full multi-source data fetching, persistent accumulation, factor-scoring refactor to canonical_universe, the 7-signal news_activity_score (with Cohen-Malloy-Pomorski opportunistic-insider classifier as lead), Yang-Zhang realized volatility, OpenBB multi-provider router, and dual-write equivalence harness.
 **Slots into:** the layer architecture, Phase A.3 (now expanded to absorb A.3.1 methodology upgrades).
 **Related:**
-- [docs/claude-code/specs/2026-05-21-multi-source-data-adapter-design.md](2026-05-21-multi-source-data-adapter-design.md) — A.1 sub-spec (shipped)
+- [docs/design/specs/2026-05-21-multi-source-data-adapter-design.md](2026-05-21-multi-source-data-adapter-design.md) — A.1 sub-spec (shipped)
 - [docs/methodology/methodology-handbook.md](../../methodology/methodology-handbook.md) — running explainer
 
 ---

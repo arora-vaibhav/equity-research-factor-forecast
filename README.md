@@ -2,7 +2,7 @@
 
 A research-grade equity factor forecast and reporting pipeline. Multi-source data fabric, a methodology library that traces every signal back to the papers, and a three-layer pipeline that ends in a per-ticker HTML report.
 
-![CI](https://github.com/arora-vaibhav/equity-research-factor-forecast-claude/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/arora-vaibhav/equity-research-factor-forecast/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
@@ -42,7 +42,7 @@ The whole pipeline runs on free data sources. Everything that comes out the othe
 | Configs | `config/` | API keys (template), data-source priorities, scoring weights, orchestrator quotas, LM dictionary, GDELT alias |
 | Scripts | `scripts/` | `forecast_demo.py` (synthetic, no network), `forecast_live_demo.py` (live data), `benchmark_directional.py`, `daily_assessment.py`, `orchestrator_tick.py`, `polygon_backfill.py` |
 | Notebooks | `notebooks/` | `layer1_control.ipynb` (Layer 1 driver), `layer1_v2_drilldown.ipynb`, `smoke_tests.ipynb` |
-| Plans and specs | `docs/claude-code/` | ~17 implementation plans and 2 design specs preserved as engineering receipts |
+| Plans and specs | `docs/design/` | ~17 implementation plans and 2 design specs preserved as engineering receipts |
 | Methodology docs | `docs/methodology/` | Methodology handbook, factor-models reference, options pricing, volatility analysis, research bibliography |
 
 ---
@@ -50,7 +50,7 @@ The whole pipeline runs on free data sources. Everything that comes out the othe
 ## Architecture
 
 ```
-                          equity-research-factor-forecast-claude
+                          equity-research-factor-forecast
                           ====================================
 
          +---------------------- Data layer (src/common) ---------------------+
@@ -171,7 +171,7 @@ The full audit lives at `docs/benchmarks/directional_accuracy.md`, with the repr
 
 ## Design discipline
 
-Every non-trivial component in this project was specified before it was implemented. The design specs and implementation plans I wrote during the build are preserved under [`docs/claude-code/specs/`](docs/claude-code/specs) and [`docs/claude-code/plans/`](docs/claude-code/plans). Each spec names the design alternatives that were considered and the one that was chosen. Each plan decomposes the spec into file-by-file steps with acceptance criteria written before the code.
+Every non-trivial component in this project was specified before it was implemented. The design specs and implementation plans I wrote during the build are preserved under [`docs/design/specs/`](docs/design/specs) and [`docs/design/plans/`](docs/design/plans). Each spec names the design alternatives that were considered and the one that was chosen. Each plan decomposes the spec into file-by-file steps with acceptance criteria written before the code.
 
 The data-adapter layer (`src/common/datasources/`) is the clearest example. It decomposed into ten independent sub-plans — watermarks foundation, Finviz/Yahoo fetch, EDGAR XBRL fundamentals, EDGAR insider and filings, FRED + FINRA, StockAnalysis ratios, OpenBB router, the rate-limited orchestrator, news-activity sub-signals, the Loughran-McDonald tone module, and the Yang-Zhang volatility + composite signal. Each sub-plan had its own acceptance test that had to fail before any implementation code was allowed to land. An end-to-end integration test ([`tests/integration/test_a3_end_to_end.py`](tests/integration/test_a3_end_to_end.py)) confirmed the ten pieces fit together once they all cleared their unit tests.
 
@@ -184,8 +184,8 @@ The test-first discipline is enforced by structure. `tests/` mirrors `src/` one-
 PowerShell (Windows):
 
 ```powershell
-git clone https://github.com/arora-vaibhav/equity-research-factor-forecast-claude.git
-cd equity-research-factor-forecast-claude
+git clone https://github.com/arora-vaibhav/equity-research-factor-forecast.git
+cd equity-research-factor-forecast
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
@@ -198,8 +198,8 @@ python scripts/forecast_demo.py
 Bash (macOS / Linux / WSL):
 
 ```bash
-git clone https://github.com/arora-vaibhav/equity-research-factor-forecast-claude.git
-cd equity-research-factor-forecast-claude
+git clone https://github.com/arora-vaibhav/equity-research-factor-forecast.git
+cd equity-research-factor-forecast
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
@@ -288,7 +288,7 @@ A few decisions I'd defend if asked.
 
 A few things on the explicit non-shipped list, prioritised:
 
-- **Conformal prediction intervals on Layer 3.** The ensemble currently quotes 80% and 95% intervals from the parametric distribution. Conformal prediction would give finite-sample valid intervals without distributional assumptions. The plan is drafted in `docs/claude-code/plans/2026-05-23-forecast-layer-v2-overhaul.md` and the wiring is on the v8 backlog.
+- **Conformal prediction intervals on Layer 3.** The ensemble currently quotes 80% and 95% intervals from the parametric distribution. Conformal prediction would give finite-sample valid intervals without distributional assumptions. The plan is drafted in `docs/design/plans/2026-05-23-forecast-layer-v2-overhaul.md` and the wiring is on the v8 backlog.
 - **PCP-deviation directional signal.** Cremers & Weinbaum (2010, *JFQA*) — put-call parity violations on individual equity options have predictive content for directional return. Source data (Polygon options chains) is already in. The signal computation isn't yet implemented.
 - **Variance risk premium as a regime indicator.** Bollerslev, Tauchen & Zhou (2009, *RFS*) — the VRP itself is time-varying and predictive of future returns. Currently the HMM regime is on returns/vol; layering VRP on top is straightforward.
 - **Live deployment loop.** The forecast pipeline runs end-to-end as a one-shot script; a cron-driven version with state persistence and report archival is a tractable extension but currently out of scope.
@@ -318,8 +318,8 @@ The benchmark methodology and its honest verdict against published baselines:
 
 The engineering receipts for the build process:
 
-- `docs/claude-code/specs/` — 2 design specs
-- `docs/claude-code/plans/` — ~17 implementation plans, each with explicit acceptance criteria
+- `docs/design/specs/` — 2 design specs
+- `docs/design/plans/` — ~17 implementation plans, each with explicit acceptance criteria
 
 ---
 
