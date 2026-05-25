@@ -1,0 +1,25 @@
+# Trade Identifier Strategy Configuration
+
+universe:
+  min_market_cap_usd: 10_000_000_000 # 10 billion
+  min_avg_daily_volume: 500_000      # 500k shares
+  exchanges: ["NYQ", "NMS"]          # NYSE and NASDAQ (yfinance suffixes)
+
+playbook_a:
+  max_valuation_percentile: 0.30     # Bottom 30% of 5-year history
+  min_earnings_surprise_pct: 0.02    # > 2% positive surprise
+
+playbook_b:
+  min_valuation_percentile: 0.75     # Top 25% of 5-year history
+
+finviz_long:
+  pe_max: 25.0
+  operating_margin_min: 0.25         # Over 25%
+  net_profit_margin_min: 0.15        # Over 15%
+  high_52w_distance_low_max: 0.10    # 0-10% above low
+  ath_distance_high_min: 0.30        # 30% or more below High
+
+finviz_short:
+  pe_min: 50.0
+  performance_year_min: 1.0          # +100%
+  high_52w_distance_high_max: 0.10   # 0-10% below High
