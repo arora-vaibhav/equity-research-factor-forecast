@@ -60,20 +60,20 @@ The whole pipeline runs on free data sources. Everything that comes out the othe
          |     |         |       |       |       |          |                 |
          |     v         v       v       v       v          v                 |
          |   +-------------------------------------------------+              |
-         |   |          BaseDataSource + Registry             |              |
-         |   |   (per-field priority + weighted resolution)   |              |
+         |   |          BaseDataSource + Registry             |               |
+         |   |   (per-field priority + weighted resolution)   |               |
          |   +-------------------------------------------------+              |
          |                          |                                         |
          |                          v                                         |
          |   +-------------------------------------------------+              |
-         |   |    Rate-limited orchestrator                   |              |
-         |   |    quota windows + priority queue + budgets    |              |
+         |   |    Rate-limited orchestrator                   |               |
+         |   |    quota windows + priority queue + budgets    |               |
          |   +-------------------------------------------------+              |
          |                          |                                         |
          |                          v                                         |
          |   +-------------------------------------------------+              |
-         |   |   SQLite (database.py + schemas.py)            |              |
-         |   |   immutable observations, fetch watermarks     |              |
+         |   |   SQLite (database.py + schemas.py)            |               |
+         |   |   immutable observations, fetch watermarks     |               |
          |   +-------------------------------------------------+              |
          +---------------------------|----------------------------------------+
                                      |
@@ -88,36 +88,36 @@ The whole pipeline runs on free data sources. Everything that comes out the othe
          |   TA signal rules (17 interpreters + TV-style aggregator)          |
          |   Multi-timeframe aggregator                                       |
          |   Sector rotation            Peer comparison (FF + AFP)            |
-         |   Volume features                                                   |
-         +---------------------------|----------------------------------------+
-                                     |
-            +------------------------+------------------------+
-            |                        |                        |
-            v                        v                        v
-   +-----------------+      +-----------------+      +-----------------+
-   |   Layer 1       |      |   Layer 2       |      |   Layer 3       |
-   |   universe      | ---> |   catalysts +   | ---> |   forecast      |
-   |   screen        |      |   setups        |      |                 |
-   |                 |      |                 |      |  LightGBM(89f)  |
-   |  multi-factor   |      |  catalyst       |      |  HMM regime(3s) |
-   |  scoring +      |      |  calendar +     |      |  Ensemble:      |
-   |  waterfall      |      |  technical      |      |   LGBM+AR1+MC   |
-   |  diagnostics    |      |  setups         |      |   +linear+macro |
-   |                 |      |                 |      |  Purged WF + EM |
-   |                 |      |                 |      |  Placebo audit  |
-   |                 |      |                 |      |  Sensitivity    |
-   |                 |      |                 |      |  IC backtest    |
-   +-----------------+      +-----------------+      +-----------------+
-            |                        |                        |
-            +------------------------+------------------------+
-                                     |
-                                     v
-                          +-----------------------+
-                          |  HTML report (Jinja2) |
-                          |  Bloomberg-dark, per  |
-                          |  ticker + index page  |
-                          +-----------------------+
-```
+         |   Volume features                                                  |
+         +-----------------------------------|--------------------------------+
+                                             |
+                    +------------------------+------------------------+
+                    |                        |                        |
+                    v                        v                        v
+        +-----------------+      +-----------------+      +-----------------+
+        |   Layer 1       |      |   Layer 2       |      |   Layer 3       |
+        |   universe      | ---> |   catalysts +   | ---> |   forecast      |
+        |   screen        |      |   setups        |      |                 |
+        |                 |      |                 |      |  LightGBM(89f)  |
+        |  multi-factor   |      |  catalyst       |      |  HMM regime(3s) |
+        |  scoring +      |      |  calendar +     |      |  Ensemble:      |
+        |  waterfall      |      |  technical      |      |   LGBM+AR1+MC   |
+        |  diagnostics    |      |  setups         |      |   +linear+macro |
+        |                 |      |                 |      |  Purged WF + EM |
+        |                 |      |                 |      |  Placebo audit  |
+        |                 |      |                 |      |  Sensitivity    |
+        |                 |      |                 |      |  IC backtest    |
+        +-----------------+      +-----------------+      +-----------------+
+                    |                        |                        |
+                    +------------------------+------------------------+
+                                            |
+                                            v
+                                +-----------------------+
+                                |  HTML report (Jinja2) |
+                                |  Bloomberg-dark, per  |
+                                |  ticker + index page  |
+                                +-----------------------+
+        ```
 
 The contract everywhere: pure functions where possible, pandas Series/DataFrames in and out, version stamps on every signal module, tests that mirror `src/` 1:1.
 
